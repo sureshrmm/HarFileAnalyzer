@@ -43,6 +43,8 @@ public class HarAnalyzerUtil {
 	private static JSONArray secondContentArray = new JSONArray();
 	private static JSONObject rootObject = new JSONObject();
 	private static JSONArray contentDifference = new JSONArray();
+	private static JSONArray notMatchedURLsArray = new JSONArray();
+	private static JSONObject thirdsheetContent = new JSONObject();
 	
 
 	static {
@@ -199,7 +201,7 @@ public class HarAnalyzerUtil {
 		}
 	}
 
-	public static void xlsReadWriteUpdate(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList)
+	public static JSONObject xlsReadWriteUpdate(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList)
 			throws IOException, JSONException {
 		String baseUrl = firstEntryList.get(0).getRequest().getUrl();
 		baseUrl = baseUrl.split("/")[2];
@@ -258,47 +260,56 @@ public class HarAnalyzerUtil {
 		}
 		removeHarEntry(firstEntryList, secondEntryList, firstAddedList, secondAddedList);
 
+		JSONObject notMatchedList = new JSONObject();
 		if (firstEntryList.size() > 0) {
 			for (HarEntry harEntry : firstEntryList) {
 				writeSecondSheet(harEntry, firstAddedList, firstHarName);
 			}
 		}
+		notMatchedList.put(firstHarName, notMatchedURLsArray);
+		
+		notMatchedURLsArray = new JSONArray();
+		
 		if (secondEntryList.size() > 0) {
 			for (HarEntry harEntry : secondEntryList) {
 				writeSecondSheet(harEntry, secondAddedList, secondHarName);
 			}
 		}
+		notMatchedList.put(secondHarName, notMatchedURLsArray);
+		
+		removeHarEntry(firstEntryList, secondEntryList, firstAddedList, secondAddedList);
+
+		
+		
+		
+		
+		JSONObject thirdSheet = new JSONObject();
+		writeThirdSheet(firstAddedList, 1);
+		thirdSheet.put(firstHarName, thirdsheetContent);
+		thirdsheetContent = new JSONObject();
+		writeThirdSheet(secondAddedList, 2);
+		thirdSheet.put(secondHarName, thirdsheetContent);
 		
 		JSONObject jsonObject= new JSONObject();
 		jsonObject.put("requestDetails", firstContentArray);
 		jsonObject.put("releaseName", firstHarName);
+		firstReleaseObject.append("details", jsonObject);
 		
-		JSONObject jsonObject1= new JSONObject();
-		jsonObject1.put("requestDetails", secondContentArray);
-		jsonObject1.put("releaseName", secondHarName);
+		jsonObject= new JSONObject();
+		jsonObject.put("requestDetails", secondContentArray);
+		jsonObject.put("releaseName", secondHarName);
 		
 		firstReleaseObject.append("details", jsonObject);
-		firstReleaseObject.append("details", jsonObject1);
 		firstReleaseObject.put("differences", contentDifference);
 		
-		//jsonObject = firstReleaseObject.append("details", jsonObject);
-		
 		rootObject.put("matchedURLs", firstReleaseObject);
+		rootObject.put("notMatchedURLs", notMatchedList);
+		rootObject.put("totalomparision", thirdSheet);
 		
-		/*JSONObject secondJsonObject= new JSONObject();
-		secondJsonObject = secondJsonObject.put("requestDetails", secondContentArray);
-		secondJsonObject = secondJsonObject.put("releaseName", secondHarName);
-		secondJsonObject = firstReleaseObject.append("details", secondJsonObject);
-		rootObject.put("Matched_Urls", secondJsonObject);*/
-
-		removeHarEntry(firstEntryList, secondEntryList, firstAddedList, secondAddedList);
-
-		writeThirdSheet(firstAddedList, 1);
-		writeThirdSheet(secondAddedList, 2);
 		
 		
 		System.out.println("rootObject=========> " + rootObject.toString());
-
+		return rootObject;
 	}
 
 	private static void removeHarEntry(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList,
@@ -404,6 +415,18 @@ public class HarAnalyzerUtil {
 			HSSFRow row10 = worksheet.getRow(10);
 			HSSFCell cell10 = row10.createCell(col);
 			cell10.setCellValue(othersCount);
+			
+			thirdsheetContent.put("totalRequest", harEntries.size());
+			thirdsheetContent.put("htmlCount", htmlCount);
+			thirdsheetContent.put("htmlSize", htmlSize);
+			thirdsheetContent.put("javascriptCount", jsCount);
+			thirdsheetContent.put("javascriptSize", jsSize);
+			thirdsheetContent.put("cssCount", cssCount);
+			thirdsheetContent.put("cssSize", cssSize);
+			thirdsheetContent.put("imageCount", imageCount);
+			thirdsheetContent.put("imageSize", imageSize);
+			thirdsheetContent.put("othersCount", othersCount);
+			
 
 			FileOutputStream output_file = new FileOutputStream(
 					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
@@ -417,6 +440,9 @@ public class HarAnalyzerUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -476,11 +502,21 @@ public class HarAnalyzerUtil {
 			cell = row.createCell(5);
 			Date startedDateTime = harEntry.getStartedDateTime();
 			long onloadtime = startedDateTime.getTime();
+			String onload = "";
 			if (firstPageOnload > onloadtime) {
-				cell.setCellValue("BEFORE");
+				onload = "BEFORE";
 			} else {
-				cell.setCellValue("AFTER");
+				onload = "AFTER";
 			}
+			cell.setCellValue(onload);
+			
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("url", harEntry.getRequest().getUrl());
+			jsonObject.put("responseCode", harEntry.getResponse().getStatus());
+			jsonObject.put("timeTaken", ConvertedTime);
+			jsonObject.put("fileSize", ConvertedFileSize);
+			jsonObject.put("onload", onload);
+			notMatchedURLsArray.put(jsonObject);
 
 			FileOutputStream output_file = new FileOutputStream(
 					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
@@ -493,6 +529,9 @@ public class HarAnalyzerUtil {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

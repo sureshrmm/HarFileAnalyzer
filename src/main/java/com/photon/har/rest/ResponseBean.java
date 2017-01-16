@@ -7,7 +7,14 @@ public class ResponseBean {
 	
 	private int status;
 	private String message;
+	private String jsonObject;
 	
+	public String getJsonObject() {
+		return jsonObject;
+	}
+	public void setJsonObject(String jsonObject) {
+		this.jsonObject = jsonObject;
+	}
 	public int getStatus() {
 		return status;
 	}
@@ -19,10 +26,6 @@ public class ResponseBean {
 	}
 	public void setMessage(String message) {
 		this.message = message;
-	}	
-	
-	@Override
-	public String toString() {
-		return "ResponseBean [status=" + status + ", message=" + message + "]";
 	}
+	
 }

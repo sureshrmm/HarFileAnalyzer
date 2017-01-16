@@ -56,7 +56,6 @@ public class HarFileAnalyzer {
 			Response response = getHarAnalysys(firstFileName, secondFileName, jsonObject);
 			File deleteDir = new File(".");
 			deleteDir = new File(deleteDir + "/tempDir/");
-			Thread.sleep(10000);
 			if (deleteDir.isDirectory()) {
 				deleteTempFile(deleteDir);
 			}
@@ -65,13 +64,12 @@ public class HarFileAnalyzer {
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
 			return Response.status(301).entity(bean).build();
-		} catch (InterruptedException e) {
-			return null;
 		}
 	}
 
 	private Response getHarAnalysys(String firstHarfileLocation, String secondHarfileLocation, JSONObject jsonObject) {
 		ResponseBean bean = new ResponseBean();
+		JSONObject JsonResponse = null;
 		try {
 			HarReader harReader = new HarReader();
 			File tempDir = new File(".");
@@ -130,8 +128,12 @@ public class HarFileAnalyzer {
 				}
 			}
 
-			HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
-
+			JsonResponse = HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
+			bean.setStatus(200);
+			bean.setMessage("Success");
+			bean.setJsonObject(JsonResponse.toString());
+			System.out.println("JsonResponseeeeeeeeeeeeeeeeeeee====?"+bean.getJsonObject().toString());
+			return Response.status(200).entity(bean).build();
 		} catch (HarReaderException e) {
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
@@ -143,9 +145,7 @@ public class HarFileAnalyzer {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		bean.setStatus(200);
-		bean.setMessage("Success");
-		return Response.status(200).entity(bean).build();
+		return null;
 	}
 
 	@POST
