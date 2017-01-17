@@ -278,10 +278,6 @@ public class HarAnalyzerUtil {
 		notMatchedList.put(secondHarName, notMatchedURLsArray);
 		
 		removeHarEntry(firstEntryList, secondEntryList, firstAddedList, secondAddedList);
-
-		
-		
-		
 		
 		JSONObject thirdSheet = new JSONObject();
 		writeThirdSheet(firstAddedList, 1);
@@ -304,7 +300,7 @@ public class HarAnalyzerUtil {
 		
 		rootObject.put("matchedURLs", firstReleaseObject);
 		rootObject.put("notMatchedURLs", notMatchedList);
-		rootObject.put("totalomparision", thirdSheet);
+		rootObject.put("totalComparision", thirdSheet);
 		
 		
 		

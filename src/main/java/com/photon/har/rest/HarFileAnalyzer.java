@@ -19,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -132,7 +133,6 @@ public class HarFileAnalyzer {
 			bean.setStatus(200);
 			bean.setMessage("Success");
 			bean.setJsonObject(JsonResponse.toString());
-			System.out.println("JsonResponseeeeeeeeeeeeeeeeeeee====?"+bean.getJsonObject().toString());
 			return Response.status(200).entity(bean).build();
 		} catch (HarReaderException e) {
 			bean.setStatus(301);
@@ -171,10 +171,12 @@ public class HarFileAnalyzer {
 			String harfileLocation = tempDir.getAbsolutePath();
 			File harFiles = new File(harfileLocation);
 			File[] listFiles = harFiles.listFiles();
+			JSONArray rootArray = new JSONArray();
 			HarReportUtil harReportUtil = new HarReportUtil("harReport");
 			for (File file : listFiles) {
 				harReportUtil.createReportHeader(file);
-				harReportUtil.writeReportData(file, null);
+				JSONObject writeReportData = harReportUtil.writeReportData(file, null);
+				rootArray.put(writeReportData);
 			}
 			deleteTempFile(tempDir);
 		} catch (IOException e) {
@@ -228,7 +230,6 @@ public class HarFileAnalyzer {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response harComparision() throws IOException {
 		String harfileLocation = getProperty("harfileslocation1");
-		System.out.println("harfileLocation=====> " + harfileLocation);
 		HarReportUtil harReportUtil = new HarReportUtil("ARYA");
 		Map<String, HashMap<String,Double>> onloadPageloadValueTimeMap = new HashMap<String,HashMap<String,Double>>();
 		//String harfileLocation = "D:/TestData/Harfiles1/";

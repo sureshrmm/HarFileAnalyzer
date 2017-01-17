@@ -1,6 +1,5 @@
 package com.photon.har.rest.util;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,14 +13,15 @@ import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.umass.cs.benchlab.har.HarEntry;
 import edu.umass.cs.benchlab.har.HarLog;
@@ -37,6 +37,7 @@ public class HarReportUtil {
 	private String fileName = "";
 	private HashMap<String, Double> onloadTimeMap;
 	private HashMap<String, Double> pageloadTimeMap;
+	//private static JSONObject harNameObject = new JSONObject();;
 	
 	public HarReportUtil(String fileName) {
 		File currentFolder = new File(".");
@@ -88,7 +89,7 @@ public class HarReportUtil {
 		
 	}
 	
-	public void writeReportData(File harFile, Map<String, HashMap<String, Double>> onloadMap) {
+	public JSONObject writeReportData(File harFile, Map<String, HashMap<String, Double>> onloadMap) {
 		try {
 			HarFileReader harFileReader = new HarFileReader();
 			List<HarWarning> harWarnings = new ArrayList<HarWarning>();
@@ -99,11 +100,17 @@ public class HarReportUtil {
 			
 			FileInputStream fsIP = new FileInputStream(reportFile);
 			HSSFSheet worksheet = workbook.getSheet(sheetName);
+			
+			JSONArray contentArray = new JSONArray();
+			JSONObject harNameObject = new JSONObject();
 
 			List<HarPage> pages = harLog.getPages().getPages();
 			DescriptiveStatistics fullyLoadedStatistics = new DescriptiveStatistics();
 			DescriptiveStatistics onlodStatistics = new DescriptiveStatistics();
 			for (int i = 1; i <= pages.size(); i++) {
+				JSONObject contentObject = new JSONObject();
+				contentObject.put("iterationNo", i);
+				
 				HSSFRow row = worksheet.createRow(i);
 				HSSFCell cell0 = row.createCell(0);
 				cell0.setCellValue(i);
@@ -112,15 +119,19 @@ public class HarReportUtil {
 				double onLoad = pages.get(i-1).getPageTimings().getOnLoad();
 				cell2.setCellValue(onLoad);
 				onlodStatistics.addValue(onLoad);
+				contentObject.put("onLoad", onLoad);
+				
 				
 				HSSFCell cell3 = row.createCell(3);
 				String firstPaint = pages.get(i-1).getCustomFields().getCustomFieldValue("_firstPaint");
 				cell3.setCellValue(Integer.parseInt(firstPaint));
+				contentObject.put("firstPaint", Integer.parseInt(firstPaint));
 				
 				String bytesIn = pages.get(i-1).getCustomFields().getCustomFieldValue("_bytesIn");
 				if (bytesIn != null) {
 					HSSFCell cell4 = row.createCell(4);
 					cell4.setCellValue(Long.parseLong(bytesIn));
+					contentObject.put("bytesin", Integer.parseInt(firstPaint));
 				}
 				
 				List<HarEntry> entries = harLog.getEntries().getEntries();
@@ -143,17 +154,25 @@ public class HarReportUtil {
 				double calculatePageLoadTime = calculatePageLoadTime(pages.get(i-1), pageHarEntry);
 				cell1.setCellValue(calculatePageLoadTime);
 				fullyLoadedStatistics.addValue(calculatePageLoadTime);
+				contentObject.put("pageLoad", calculatePageLoadTime);
+				contentArray.put(contentObject);
 			}	
+			harNameObject.put("harName", sheetName);
+			harNameObject.put("iterations", contentArray);
 			int lastRowNumber = worksheet.getLastRowNum();
 			HSSFRow lastRow = worksheet.createRow((short) lastRowNumber + 1);
 			HSSFCell lastcell = lastRow.createCell(0);
 			lastcell.setCellValue("90th Percentile");
 			
 			lastcell = lastRow.createCell(1);
-			lastcell.setCellValue(fullyLoadedStatistics.getPercentile(90));
+			double fullyLoadedPercentile = fullyLoadedStatistics.getPercentile(90);
+			lastcell.setCellValue(fullyLoadedPercentile);
+			harNameObject.put("fullyLoaded90thPercentile", fullyLoadedPercentile);
 			
 			lastcell = lastRow.createCell(2);
-			lastcell.setCellValue(onlodStatistics.getPercentile(90));
+			double onloadPercentile = onlodStatistics.getPercentile(90);
+			lastcell.setCellValue(onloadPercentile);
+			harNameObject.put("onload90thPercentile", onloadPercentile);
 			
 			if (onloadMap != null) {
 				onloadTimeMap.put(sheetName, onlodStatistics.getPercentile(90));
@@ -166,12 +185,16 @@ public class HarReportUtil {
 			
 			fsIP.close();
 			output_file.close();
-			
+			return harNameObject;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	

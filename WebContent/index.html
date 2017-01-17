@@ -113,12 +113,29 @@
                         </div>
                     </div>
                     <div class="container-fluid table-responsive hide" id="analysisReport" style="padding-left: 0;padding-right: 0;">
-                        <h5>
-                            <a href="javascript:void(0);" ng-click="showAnalyseTab();">
-                                <span style="font-size:12px;">&#10094;</span> Back
-                            </a>
-                        </h5>
-                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;">
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showAnalyseTab();">
+                                    <span style="font-size:12px;">&#10094;</span> Back
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="col-lg-6 col-sm-6 col-6" style="text-align: right;">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showMatchedURLsData();" id="matchedURLsLink">
+                                    Matched URLs
+                                </a>
+                                <span> | </span>
+                                <a href="javascript:void(0);" ng-click="showUnmatchedURLsData();" style="font-weight: normal;" id="unmatchedURLsLink">
+                                    Unmatched URLs
+                                </a>
+                                <span> | </span>
+                                <a href="javascript:void(0);" ng-click="showTotalComparisionData();" style="font-weight: normal;" id="totalComparisionLink">
+                                    Total Comparision
+                                </a>
+                            </h5>
+                        </div>
+                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
                             <thead>
                                 <tr>
                                     <th class="col-xs-2"></th>
@@ -153,6 +170,100 @@
                                     <td>{{release2Details[$index].onload}}</td>
                                     <td style="background-color: #f5f5f5;">{{differences[$index].timeDiff}}</td>
                                     <td style="background-color: #f5f5f5;">{{differences[$index].sizeDiff}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-condensed hide" style="table-layout: fixed;word-wrap: break-word;" id="unmatchedURLs">
+                            <thead>
+                                <tr>
+                                    <th class="col-xs-8">URL</th>
+                                    <th>Response</th>
+                                    <th>Time Taken</th>
+                                    <th>File Size</th>
+                                    <th>Onload</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr style="text-align: center;">
+                                    <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release1Name}}</h4></td>
+                                </tr>
+                                <tr ng-repeat="release1Detail in release1Details">
+                                    <td>{{release1Detail.url}}</td>
+                                    <td>{{release1Detail.responseCode}}</td>
+                                    <td>{{release1Detail.timeTaken}}</td>
+                                    <td>{{release1Detail.fileSize}}</td>
+                                    <td>{{release1Detail.onload}}</td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release2Name}}</h4></td>
+                                </tr>
+                                <tr ng-repeat="release2Details in release1Details">
+                                    <td>{{release2Details.url}}</td>
+                                    <td>{{release2Details.responseCode}}</td>
+                                    <td>{{release2Details.timeTaken}}</td>
+                                    <td>{{release2Details.fileSize}}</td>
+                                    <td>{{release2Details.onload}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-condensed hide" style="table-layout: fixed;word-wrap: break-word;" id="totalComparision">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>{{release1Name}}</th>
+                                    <th>{{release2Name}}</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Request</td>
+                                    <td>{{release1Details.totalRequest}}</td>
+                                    <td>{{release2Details.totalRequest}}</td>
+                                </tr>
+                                <tr>
+                                    <td>HTML / Text - Count</td>
+                                    <td>{{release1Details.htmlCount}}</td>
+                                    <td>{{release2Details.htmlCount}}</td>
+                                </tr>
+                                <tr>
+                                    <td>HTML / Text - Size</td>
+                                    <td>{{release1Details.htmlSize}}</td>
+                                    <td>{{release2Details.htmlSize}}</td>
+                                </tr>
+                                <tr>
+                                    <td>JavaScript Count</td>
+                                    <td>{{release1Details.javascriptCount}}</td>
+                                    <td>{{release2Details.javascriptCount}}</td>
+                                </tr>
+                                <tr>
+                                    <td>JavaScript Size</td>
+                                    <td>{{release1Details.javascriptSize}}</td>
+                                    <td>{{release2Details.javascriptSize}}</td>
+                                </tr>
+                                <tr>
+                                    <td>CSS - Count</td>
+                                    <td>{{release1Details.cssCount}}</td>
+                                    <td>{{release2Details.cssCount}}</td>
+                                </tr>
+                                <tr>
+                                    <td>CSS - Size</td>
+                                    <td>{{release1Details.cssSize}}</td>
+                                    <td>{{release2Details.cssSize}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Image - Count</td>
+                                    <td>{{release1Details.imageCount}}</td>
+                                    <td>{{release2Details.imageCount}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Image - Size</td>
+                                    <td>{{release1Details.imageSize}}</td>
+                                    <td>{{release2Details.imageSize}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Others- Count</td>
+                                    <td>{{release1Details.othersCount}}</td>
+                                    <td>{{release2Details.othersCount}}</td>
                                 </tr>
                             </tbody>
                         </table>
