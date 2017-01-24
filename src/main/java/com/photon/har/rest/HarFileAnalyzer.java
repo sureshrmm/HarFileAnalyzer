@@ -153,6 +153,7 @@ public class HarFileAnalyzer {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response getHarReport(FormDataMultiPart multipart) {
 
+		JSONArray rootArray = new JSONArray();
 		try {
 			List<FormDataBodyPart> fields = multipart.getFields("files");
 			for (int i = 0; i < fields.size(); i++) {
@@ -171,7 +172,6 @@ public class HarFileAnalyzer {
 			String harfileLocation = tempDir.getAbsolutePath();
 			File harFiles = new File(harfileLocation);
 			File[] listFiles = harFiles.listFiles();
-			JSONArray rootArray = new JSONArray();
 			HarReportUtil harReportUtil = new HarReportUtil("harReport");
 			for (File file : listFiles) {
 				harReportUtil.createReportHeader(file);
@@ -182,7 +182,11 @@ public class HarFileAnalyzer {
 		} catch (IOException e) {
 			return Response.status(301).entity("Har Report Failed...").build();
 		}
-		return Response.status(200).entity("Har Report Successfully Generated....").build();
+		ResponseBean bean = new ResponseBean();
+		bean.setStatus(200);
+		bean.setMessage("Success");
+		bean.setJsonObject(rootArray.toString());
+		return Response.status(200).entity(bean).build();
 	}
 
 	private static String getProperty(String key) throws IOException {

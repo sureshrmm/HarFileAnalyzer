@@ -16,7 +16,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         var file2 = $scope.secondHARFile;
         var requestData = angular.toJson(requestData);
         $scope.message = "";
-        $("#loader").removeClass();
+        $("#loader").removeClass("hide");
         perfAnalyserService.uploadFile(file1, file2, requestData, fileUploadserviceURL, function(response) {
         	$("#loader").addClass("hide");
         	if (response) {
@@ -30,16 +30,13 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         });
     };
     $scope.showAnalyseResponse = function(response) {
-        //perfAnalyserService.readJSON("FinalJson.json", function(data){
-            $scope.analyseData = response;
-            $("#analysisForm").addClass("hide");
-            $("#analysisReport").removeClass("hide");
-            $scope.showMatchedURLsData();
-        //});
+        $scope.analyseData = response;
+        $scope.showMatchedURLsData();
     };
     $scope.showMatchedURLsData = function() {
-    	console.log("****************", $scope.analyseData.matchedURLs);
-        if ($scope.analyseData && $scope.analyseData.matchedURLs) {
+    	if ($scope.analyseData && $scope.analyseData.matchedURLs) {
+    		$("#analysisForm").addClass("hide");
+            $("#analysisReport").removeClass("hide");
             $("#matchedURLs").removeClass("hide");
             $("#unmatchedURLs").addClass("hide");
             $("#totalComparision").addClass("hide");
@@ -78,6 +75,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         }
     };
     $scope.validateAnalyseHarFilesData = function() {
+        $scope.showAnalyseResponse();
         var hasError = false;
         if (!$("#firstHARFile").val()) {
             $("#firstHARFileLbl").addClass("color-red");
@@ -139,6 +137,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#analyseTab").removeClass("active");
         $("#report").addClass("active");
         $("#reportTab").addClass("active");
+        $("#reportData").addClass("hide");
+        $("#reportForm").removeClass("hide");
     };
     $scope.showAnalyseTab = function() {
         $("#report").removeClass("active");
@@ -152,9 +152,46 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         var requestData = {};
         var files = document.getElementById('reportFile').files;
         var serviceURL = "/HarFileAnalyzer/api/getHarReport/";
-        perfAnalyserService.reportGenerate(serviceURL, files);
+        $("#loader").removeClass("hide");
+        perfAnalyserService.reportGenerate(serviceURL, files, function(response) {
+            $("#loader").addClass("hide");
+            response = JSON.parse(response.data.jsonObject);
+            $scope.reportData = response;
+            $scope.selectedHarData = $scope.reportData[0];
+            $scope.showReportData();
+        });
+    };
+    $scope.showReportData = function() {
+    	$("#reportForm").addClass("hide");
+        $("#reportData").removeClass("hide");
+    	$('#page-selection').bootpag({
+            total: $scope.reportData.length,
+            maxVisible : 4,
+        }).on("page", function(event, num){
+            $scope.selectedHarData = $scope.reportData[num-1];
+            $scope.$apply();
+        });
+        $scope.changePageNames();
+        $(".pagination li.prev").click(function() {
+            $scope.changePageNames();
+        });
+        $(".pagination li.next").click(function() {
+            $scope.changePageNames();
+        });
+    };
+    $scope.changePageNames = function() {
+        $(".pagination li").each(function() {
+            var index = $(this).find("a").text();
+            if (index) {
+                var selectedHarData = $scope.reportData[index-1];
+                if (selectedHarData) {
+                    $(this).find("a").text(selectedHarData.harName);
+                }
+            }
+        });
     };
     $scope.validateGenerateReportData = function() {
+        //$scope.generateReport();
         var hasError = false;
         if (!$("#reportFile").val()) {
             $("#reportFileLbl").addClass("color-red");
@@ -170,7 +207,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
     };
 }]);
 perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
-    this.reportGenerate = function(serviceURL, data){
+    this.reportGenerate = function(serviceURL, data, callback){
         $("#loader").removeClass();
         var fd = new FormData();
         for (var i in data) {
@@ -180,9 +217,9 @@ perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         }).then(function successCallback(response){
-        	$("#loader").addClass("hide");
+        	callback(response);
         }, function errorCallback(response) {
-        	$("#loader").addClass("hide");
+        	callback(response);
         });
     };
     this.uploadFile = function(file1, file2, requestData, uploadUrl, callback){

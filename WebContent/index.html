@@ -32,6 +32,14 @@
             .border-red {
                 border-color: red;
             }
+            table {
+                font-size: 14px;
+            }
+            .ellipsis {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         </style>
     </head>
     <body ng-controller="PerfAnalyserController">
@@ -44,7 +52,7 @@
             <div class="alert alert-danger hide" role="alert" id="errorMessage">
               {{message}}
             </div>
-            <ul  class="nav nav-pills">
+            <ul class="nav nav-pills" style="font-size: 16px">
                 <li class="active" id="analyseTab">
                     <a href="#analyse" data-toggle="tab" ng-click="showAnalyseTab();">Analyse</a>
                 </li>
@@ -56,7 +64,12 @@
             <div class="tab-content clearfix">
                 <div class="tab-pane active" id="analyse">
                     <div id="analysisForm">
-                        <h3>Analyse HAR files</h3>
+                    	<div class="col-lg-6 col-sm-6 col-6">
+                        	<h3>Analyse HAR files</h3>
+                    	</div>
+                        <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
+                        	<h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
+                        </div>
                         <div class="col-lg-12 col-sm-12 col-12">
                             <div class="col-lg-6 col-sm-6 col-12">
                                 <h4 id="firstHARFileLbl">Select first HAR file</h4>
@@ -138,7 +151,7 @@
                         <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
                             <thead>
                                 <tr>
-                                    <th class="col-xs-2"></th>
+                                    <th class="col-xs-3"></th>
                                     <th colspan="4" style="text-align:center;background-color: #f5f5f5;">{{release1Name}}</th>
                                     <th colspan="4" style="text-align:center;">{{release2Name}}</th>
                                     <th colspan="2" style="background-color: #f5f5f5;text-align:center;">Difference</th>
@@ -159,7 +172,7 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="release1Detail in release1Details">
-                                    <td>{{release1Detail.url}}</td>
+                                    <td title="{{release1Detail.url}}" class="ellipsis">{{release1Detail.url}}</td>
                                     <td style="background-color: #f5f5f5;">{{release1Detail.responseCode}}</td>
                                     <td style="background-color: #f5f5f5;">{{release1Detail.timeTaken}}</td>
                                     <td style="background-color: #f5f5f5;">{{release1Detail.fileSize}}</td>
@@ -188,7 +201,7 @@
                                     <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release1Name}}</h4></td>
                                 </tr>
                                 <tr ng-repeat="release1Detail in release1Details">
-                                    <td>{{release1Detail.url}}</td>
+                                    <td title="{{release1Detail.url}}" class="ellipsis">{{release1Detail.url}}</td>
                                     <td>{{release1Detail.responseCode}}</td>
                                     <td>{{release1Detail.timeTaken}}</td>
                                     <td>{{release1Detail.fileSize}}</td>
@@ -197,12 +210,12 @@
                                 <tr style="text-align: center;">
                                     <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release2Name}}</h4></td>
                                 </tr>
-                                <tr ng-repeat="release2Details in release1Details">
-                                    <td>{{release2Details.url}}</td>
-                                    <td>{{release2Details.responseCode}}</td>
-                                    <td>{{release2Details.timeTaken}}</td>
-                                    <td>{{release2Details.fileSize}}</td>
-                                    <td>{{release2Details.onload}}</td>
+                                <tr ng-repeat="release2Detail in release2Details">
+                                    <td title="{{release2Detail.url}}" class="ellipsis">{{release2Detail.url}}</td>
+                                    <td>{{release2Detail.responseCode}}</td>
+                                    <td>{{release2Detail.timeTaken}}</td>
+                                    <td>{{release2Detail.fileSize}}</td>
+                                    <td>{{release2Detail.onload}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -216,52 +229,52 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Total Request</td>
+                                    <th>Total Request</th>
                                     <td>{{release1Details.totalRequest}}</td>
                                     <td>{{release2Details.totalRequest}}</td>
                                 </tr>
                                 <tr>
-                                    <td>HTML / Text - Count</td>
+                                    <th>HTML / Text - Count</th>
                                     <td>{{release1Details.htmlCount}}</td>
                                     <td>{{release2Details.htmlCount}}</td>
                                 </tr>
                                 <tr>
-                                    <td>HTML / Text - Size</td>
+                                    <th>HTML / Text - Size</th>
                                     <td>{{release1Details.htmlSize}}</td>
                                     <td>{{release2Details.htmlSize}}</td>
                                 </tr>
                                 <tr>
-                                    <td>JavaScript Count</td>
+                                    <th>JavaScript Count</th>
                                     <td>{{release1Details.javascriptCount}}</td>
                                     <td>{{release2Details.javascriptCount}}</td>
                                 </tr>
                                 <tr>
-                                    <td>JavaScript Size</td>
+                                    <th>JavaScript Size</th>
                                     <td>{{release1Details.javascriptSize}}</td>
                                     <td>{{release2Details.javascriptSize}}</td>
                                 </tr>
                                 <tr>
-                                    <td>CSS - Count</td>
+                                    <th>CSS - Count</th>
                                     <td>{{release1Details.cssCount}}</td>
                                     <td>{{release2Details.cssCount}}</td>
                                 </tr>
                                 <tr>
-                                    <td>CSS - Size</td>
+                                    <th>CSS - Size</th>
                                     <td>{{release1Details.cssSize}}</td>
                                     <td>{{release2Details.cssSize}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Image - Count</td>
+                                    <th>Image - Count</th>
                                     <td>{{release1Details.imageCount}}</td>
                                     <td>{{release2Details.imageCount}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Image - Size</td>
+                                    <th>Image - Size</th>
                                     <td>{{release1Details.imageSize}}</td>
                                     <td>{{release2Details.imageSize}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Others- Count</td>
+                                    <th>Others- Count</th>
                                     <td>{{release1Details.othersCount}}</td>
                                     <td>{{release2Details.othersCount}}</td>
                                 </tr>
@@ -270,26 +283,75 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="report">
-                    <h3>Generate report</h3>
-                    <div class="col-lg-12 col-sm-12 col-12">
-                        <div class="col-lg-6 col-sm-6 col-12">
-                            <h4 id="reportFileLbl">Select Location</h4>
-                            <div class="input-group">
-                                <label class="input-group-btn">
-                                    <span class="btn btn-primary">
-                                        Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="reportFile">
-                                    </span>
-                                </label>
-                                <input type="text" class="form-control" readonly id="reportFileText">
+                    <div id="reportForm">
+                    	<div class="col-lg-6 col-sm-6 col-6">
+                        	<h3>Generate report</h3>
+                        </div>
+                        <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
+                        	<h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="reportFileLbl">Select Location</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="reportFile">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="reportFileText">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 class="visibility-hidden">Report</h4>
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-primary pull-right" ng-click="validateGenerateReportData();">Submit</button>
+                                    <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-sm-3 col-12">
-                            <h4 class="visibility-hidden">Report</h4>
-                            <div class="input-group">
-                                <button type="button" class="btn btn-primary pull-right" ng-click="validateGenerateReportData();">Submit</button>
-                                <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
-                            </div>
+                    </div>
+                    <div class="container-fluid table-responsive hide" id="reportData" style="padding-left: 0;padding-right: 0;">
+                        <div class="col-lg-2 col-sm-2 col-2">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showReportTab();">
+                                    <span style="font-size:12px;">&#10094;</span> Back
+                                </a>
+                            </h5>
                         </div>
+                        <div class="col-lg-10 col-sm-10 col-10" style="text-align: right;font-size: 12px;" id="page-selection">
+                            
+                        </div>
+                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;">
+                            <thead>
+                                <tr>
+                                    <th>Iteration</th>
+                                    <th>Page Load</th>
+                                    <th>Onload</th>
+                                    <th>First Paint</th>
+                                    <th>Bytes(bytein)</th>
+                                    <th>No of Requests</th>
+                                    <th>TTFB</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="iteration in selectedHarData.iterations">
+                                    <td>{{iteration.iterationNo}}</td>
+                                    <td>{{iteration.pageLoad}}</td>
+                                    <td>{{iteration.onLoad}}</td>
+                                    <td>{{iteration.firstPaint}}</td>
+                                    <td>{{iteration.bytesin}}</td>
+                                    <td>{{iteration.noOfRequests}}</td>
+                                    <td>{{iteration.ttfb}}</td>
+                                </tr>
+                                <tr>
+                                    <th>90 th Percentile</th>
+                                    <td>{{selectedHarData.onload90thPercentile}}</td>
+                                    <td>{{selectedHarData.fullyLoaded90thPercentile}}</td>
+                                    <td colspan="4"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -297,6 +359,7 @@
     
         <script src="libs/js/jquery-3.1.1.min.js"></script>
         <script src="libs/js/angular.min.js"></script>
+        <script src="libs/js/jquery.bootpag.min.js"></script>
         <script src="assets/PerformanceAnalyser.js"></script>
         
         <script>

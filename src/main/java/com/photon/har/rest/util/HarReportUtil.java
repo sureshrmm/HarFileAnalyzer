@@ -131,7 +131,7 @@ public class HarReportUtil {
 				if (bytesIn != null) {
 					HSSFCell cell4 = row.createCell(4);
 					cell4.setCellValue(Long.parseLong(bytesIn));
-					contentObject.put("bytesin", Integer.parseInt(firstPaint));
+					contentObject.put("bytesin", Integer.parseInt(bytesIn));
 				}
 				
 				List<HarEntry> entries = harLog.getEntries().getEntries();
@@ -144,11 +144,13 @@ public class HarReportUtil {
 					}
 					HSSFCell cell5 = row.createCell(5);
 					cell5.setCellValue(entryCount);
+					contentObject.put("noOfRequests", entryCount);
 				}
 				
 				String ttfb = pages.get(i-1).getCustomFields().getCustomFieldValue("_TTFB");
 				HSSFCell cell6 = row.createCell(6);
 				cell6.setCellValue(Integer.parseInt(ttfb));
+				contentObject.put("ttfb", ttfb);
 				
 				HSSFCell cell1 = row.createCell(1);
 				double calculatePageLoadTime = calculatePageLoadTime(pages.get(i-1), pageHarEntry);
