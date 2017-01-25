@@ -1,0 +1,5 @@
+{
+    "browsers":["Chrome","Firefox","Safari","IE"],
+    "environments":["www3","m-perf","m-qa2"],
+    "bandwidths":["750","20","2"]
+}

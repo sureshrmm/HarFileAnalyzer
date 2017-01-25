@@ -1,10 +1,12 @@
 package com.photon.har.rest;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,6 +229,47 @@ public class HarFileAnalyzer {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+	
+	
+	@POST
+	@Path("/downloadHARFiles")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public static Response bulkHArFilesDownload(InputStream inputStream) {
+		
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			StringBuilder builder = new StringBuilder();
+			
+			String property = System.getProperty("user.dir");
+			File rootDir = new File(property);
+			String zipDir = rootDir.getParent() + File.separator + "webapps" + File.separator + "HarFileAnalyzer/harFiles/";
+			File zipLoc = new File(zipDir);
+			System.out.println("Root Path======>" + zipLoc);
+			
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+			}
+			JSONObject jsonObject = new JSONObject(builder.toString());
+			String wptURL = jsonObject.get("wptURL").toString();
+			String releaseName = jsonObject.get("releaseName").toString();
+			String environment = jsonObject.get("environment").toString();
+			String browser = jsonObject.get("browser").toString();
+			String bandwidth = jsonObject.get("bandwidth").toString();
+			String downloadHarFile = DownloadHar.downloadHarFile(wptURL, zipDir, releaseName, browser, environment, bandwidth);
+			ResponseBean bean = new ResponseBean();
+			bean.setJsonObject(downloadHarFile);
+			bean.setStatus(200);
+			bean.setMessage("Success");
+			return Response.status(200).entity(bean).build();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@GET
