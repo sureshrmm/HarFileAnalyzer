@@ -1,0 +1,442 @@
+<html ng-app="perfAnalyserApp">
+    <head>
+        <link href="libs/css/bootstrap.min.css" rel="stylesheet"/>
+        <style>
+            #exTab1 .tab-content {
+                border: 5px solid #337ab7;
+                padding : 15px 15px 15px 15px;
+                border-radius: 0 5px 5px 5px;
+            }
+            #exTab2 h3 {
+                color : white;
+                background-color: #428bca;
+            }
+            #exTab1 .nav-pills > li > a {
+                border-radius: 5px 5px 0 0;
+            }
+            h3 {
+                margin-top: 0px;
+            }
+            .pt15 {
+                padding-top: 15px;
+            }
+            .mr15 {
+                margin-right: 15px;
+            }
+            .visibility-hidden {
+                visibility: hidden;
+            }
+            .color-red {
+                color: red;
+            }
+            .border-red {
+                border-color: red;
+            }
+            table {
+                font-size: 14px;
+            }
+            .ellipsis {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            h4 {
+                font-weight: normal;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body ng-controller="PerfAnalyserController">
+        <div id="loader" class="hide" style="position: fixed;top: 0;text-align: center;z-index: 1500;width: 100%;height: 100%;padding:23% 0;">
+            <img src="data:image/gif;base64,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">
+        </div>
+        
+        <div id="exTab1" class="container-fluid">
+            <h1>Performance Analyser</h1>
+            <div class="alert alert-danger hide" role="alert" id="errorMessage">
+              {{message}}
+            </div>
+            <ul class="nav nav-pills" style="font-size: 16px">
+            	<li class="active" id="wptTab">
+                    <a href="#wpt" data-toggle="tab" ng-click="showWPTTab();">WPT</a>
+                </li>
+                <li id="analyseTab">
+                    <a href="#analyse" data-toggle="tab" ng-click="showAnalyseTab();">Analyse</a>
+                </li>
+                <li id="reportTab">
+                    <a href="#report" data-toggle="tab" ng-click="showReportTab();">Report</a>
+                </li>
+            </ul>
+
+            <div class="tab-content clearfix">
+                <div class="tab-pane" id="analyse">
+                    <div id="analysisForm">
+                    	<div class="col-lg-6 col-sm-6 col-6">
+                        	<h3>Analyse HAR files</h3>
+                    	</div>
+                        <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
+                        	<h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="firstHARFileLbl">Select first HAR file</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" id="firstHARFile" file-model="firstHARFile">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="firstHARFileText">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="firstHARFileNameLbl">File name</h4>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-model="firstHARFileName" id="firstHARFileName">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="firstHARFileIterationLbl">Iteration</h4>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" min="1" ng-model="firstHARFileIteration" id="firstHARFileIteration">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="secondHARFileLbl">Select second HAR file</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" id="secondHARFile" file-model="secondHARFile">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="secondHARFileText">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="secondHARFileNameLbl">File name</h4>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-model="secondHARFileName" id="secondHARFileName">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="secondHARFileIterationLbl">Iteration</h4>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" min="1" ng-model="secondHARFileIteration" id="secondHARFileIteration">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12 pt15">
+                            <button type="button" class="btn btn-primary pull-right" ng-click="validateAnalyseHarFilesData();">Analyse</button>
+                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="container-fluid table-responsive hide" id="analysisReport" style="padding-left: 0;padding-right: 0;">
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showAnalyseTab();">
+                                    <span style="font-size:12px;">&#10094;</span> Back
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="col-lg-6 col-sm-6 col-6" style="text-align: right;">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showMatchedURLsData();" id="matchedURLsLink">
+                                    Matched URLs
+                                </a>
+                                <span> | </span>
+                                <a href="javascript:void(0);" ng-click="showUnmatchedURLsData();" style="font-weight: normal;" id="unmatchedURLsLink">
+                                    Unmatched URLs
+                                </a>
+                                <span> | </span>
+                                <a href="javascript:void(0);" ng-click="showTotalComparisionData();" style="font-weight: normal;" id="totalComparisionLink">
+                                    Total Comparision
+                                </a>
+                            </h5>
+                        </div>
+                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
+                            <thead>
+                                <tr>
+                                    <th class="col-xs-3"></th>
+                                    <th colspan="4" style="text-align:center;background-color: #f5f5f5;">{{release1Name}}</th>
+                                    <th colspan="4" style="text-align:center;">{{release2Name}}</th>
+                                    <th colspan="2" style="background-color: #f5f5f5;text-align:center;">Difference</th>
+                                </tr>
+                                <tr>
+                                    <th>URL</th>
+                                    <th style="background-color: #f5f5f5;">Response</th>
+                                    <th style="background-color: #f5f5f5;">Time Taken</th>
+                                    <th style="background-color: #f5f5f5;">File Size</th>
+                                    <th style="background-color: #f5f5f5;">Onload</th>
+                                    <th>Response</th>
+                                    <th>Time Taken</th>
+                                    <th>File Size</th>
+                                    <th>Onload</th>
+                                    <th style="background-color: #f5f5f5;">Time</th>
+                                    <th style="background-color: #f5f5f5;">Size</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="release1Detail in release1Details">
+                                    <td title="{{release1Detail.url}}" class="ellipsis">{{release1Detail.url}}</td>
+                                    <td style="background-color: #f5f5f5;">{{release1Detail.responseCode}}</td>
+                                    <td style="background-color: #f5f5f5;">{{release1Detail.timeTaken}}</td>
+                                    <td style="background-color: #f5f5f5;">{{release1Detail.fileSize}}</td>
+                                    <td style="background-color: #f5f5f5;">{{release1Detail.onload}}</td>
+                                    <td>{{release2Details[$index].responseCode}}</td>
+                                    <td>{{release2Details[$index].timeTaken}}</td>
+                                    <td>{{release2Details[$index].fileSize}}</td>
+                                    <td>{{release2Details[$index].onload}}</td>
+                                    <td style="background-color: #f5f5f5;">{{differences[$index].timeDiff}}</td>
+                                    <td style="background-color: #f5f5f5;">{{differences[$index].sizeDiff}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-condensed hide" style="table-layout: fixed;word-wrap: break-word;" id="unmatchedURLs">
+                            <thead>
+                                <tr>
+                                    <th class="col-xs-8">URL</th>
+                                    <th>Response</th>
+                                    <th>Time Taken</th>
+                                    <th>File Size</th>
+                                    <th>Onload</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr style="text-align: center;">
+                                    <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release1Name}}</h4></td>
+                                </tr>
+                                <tr ng-repeat="release1Detail in release1Details">
+                                    <td title="{{release1Detail.url}}" class="ellipsis">{{release1Detail.url}}</td>
+                                    <td>{{release1Detail.responseCode}}</td>
+                                    <td>{{release1Detail.timeTaken}}</td>
+                                    <td>{{release1Detail.fileSize}}</td>
+                                    <td>{{release1Detail.onload}}</td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release2Name}}</h4></td>
+                                </tr>
+                                <tr ng-repeat="release2Detail in release2Details">
+                                    <td title="{{release2Detail.url}}" class="ellipsis">{{release2Detail.url}}</td>
+                                    <td>{{release2Detail.responseCode}}</td>
+                                    <td>{{release2Detail.timeTaken}}</td>
+                                    <td>{{release2Detail.fileSize}}</td>
+                                    <td>{{release2Detail.onload}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-condensed hide" style="table-layout: fixed;word-wrap: break-word;" id="totalComparision">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>{{release1Name}}</th>
+                                    <th>{{release2Name}}</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Total Request</th>
+                                    <td>{{release1Details.totalRequest}}</td>
+                                    <td>{{release2Details.totalRequest}}</td>
+                                </tr>
+                                <tr>
+                                    <th>HTML / Text - Count</th>
+                                    <td>{{release1Details.htmlCount}}</td>
+                                    <td>{{release2Details.htmlCount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>HTML / Text - Size</th>
+                                    <td>{{release1Details.htmlSize}}</td>
+                                    <td>{{release2Details.htmlSize}}</td>
+                                </tr>
+                                <tr>
+                                    <th>JavaScript Count</th>
+                                    <td>{{release1Details.javascriptCount}}</td>
+                                    <td>{{release2Details.javascriptCount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>JavaScript Size</th>
+                                    <td>{{release1Details.javascriptSize}}</td>
+                                    <td>{{release2Details.javascriptSize}}</td>
+                                </tr>
+                                <tr>
+                                    <th>CSS - Count</th>
+                                    <td>{{release1Details.cssCount}}</td>
+                                    <td>{{release2Details.cssCount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>CSS - Size</th>
+                                    <td>{{release1Details.cssSize}}</td>
+                                    <td>{{release2Details.cssSize}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Image - Count</th>
+                                    <td>{{release1Details.imageCount}}</td>
+                                    <td>{{release2Details.imageCount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Image - Size</th>
+                                    <td>{{release1Details.imageSize}}</td>
+                                    <td>{{release2Details.imageSize}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Others- Count</th>
+                                    <td>{{release1Details.othersCount}}</td>
+                                    <td>{{release2Details.othersCount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="report">
+                    <div id="reportForm">
+                    	<div class="col-lg-6 col-sm-6 col-6">
+                        	<h3>Generate report</h3>
+                        </div>
+                        <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
+                        	<h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="reportFileLbl">Select Location</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="reportFile">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="reportFileText">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 class="visibility-hidden">Report</h4>
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-primary pull-right" ng-click="validateGenerateReportData();">Submit</button>
+                                    <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid table-responsive hide" id="reportData" style="padding-left: 0;padding-right: 0;">
+                        <div class="col-lg-2 col-sm-2 col-2">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showReportTab();">
+                                    <span style="font-size:12px;">&#10094;</span> Back
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="col-lg-10 col-sm-10 col-10" style="text-align: right;font-size: 12px;" id="page-selection">
+                            
+                        </div>
+                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;">
+                            <thead>
+                                <tr>
+                                    <th>Iteration</th>
+                                    <th>Page Load</th>
+                                    <th>Onload</th>
+                                    <th>First Paint</th>
+                                    <th>Bytes(bytein)</th>
+                                    <th>No of Requests</th>
+                                    <th>TTFB</th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="iteration in selectedHarData.iterations">
+                                    <td>{{iteration.iterationNo}}</td>
+                                    <td>{{iteration.pageLoad}}</td>
+                                    <td>{{iteration.onLoad}}</td>
+                                    <td>{{iteration.firstPaint}}</td>
+                                    <td>{{iteration.bytesin}}</td>
+                                    <td>{{iteration.noOfRequests}}</td>
+                                    <td>{{iteration.ttfb}}</td>
+                                </tr>
+                                <tr>
+                                    <th>90 th Percentile</th>
+                                    <td>{{selectedHarData.onload90thPercentile}}</td>
+                                    <td>{{selectedHarData.fullyLoaded90thPercentile}}</td>
+                                    <td colspan="4"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane active" id="wpt">
+                    <div id="wptForm">
+                    	<div class="col-lg-6 col-sm-6 col-6">
+                        	<h3>Download WPT HAR file</h3>
+                        </div>
+                        <div class="col-lg-6 col-sm-6 col-6" style="text-align:right" ng-if="downloadURL">
+                        	<a id="downloadHAR" ng-href="{{downloadURL}}" download href="javascript:void(0);"><img src="assets/images/download.png" style="width:33px; height:33px;"/></a>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="wptURLLbl">WPT URL</h4>
+                                <div class="input-group-md">
+                                    <input type="text" class="form-control" id="wptURL">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="freleaseNameLbl">Release Name</h4>
+                                <input type="text" class="form-control" ng-model="releaseName" id="releaseName">
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedEnvLbl">Environment</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedEnv" id="selectedEnv">
+                                    <option value="" selected>Select environment</option>
+                                    <option ng-repeat="environment in wptConfig.environments" value="{{environment}}">{{environment}}</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedBrowserLbl">Browser</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBrowser" id="selectedBrowser">
+                                    <option value="" selected>Select browser</option>
+                                    <option ng-repeat="browser in wptConfig.browsers" value="{{browser}}">{{browser}}</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedBandwidthLbl">Bandwidth</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBandwidth" id="selectedBandwidth">
+                                    <option value="" selected>Select bandwidth</option>
+                                    <option ng-repeat="bandwidth in wptConfig.bandwidths" value="{{bandwidth}}">{{bandwidth}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12 pt15">
+                            <button type="button" class="btn btn-primary pull-right" ng-click="validateDownloadHarFiles();">Download</button>
+                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <script src="libs/js/jquery-3.1.1.min.js"></script>
+        <script src="libs/js/angular.min.js"></script>
+        <script src="libs/js/jquery.bootpag.min.js"></script>
+        <script src="assets/PerformanceAnalyser.js"></script>
+        
+        <script>
+            $(function() {
+                $(document).on('change', ':file', function() {
+                    var input = $(this),
+                        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                    input.trigger('fileselect', [numFiles, label]);
+                });
+
+                $(document).ready( function() {
+                    $(':file').on('fileselect', function(event, numFiles, label) {
+                        var input = $(this).parents('.input-group').find(':text'),
+                            log = numFiles > 1 ? numFiles + ' files selected' : label;
+                        if(input.length) {
+                            input.val(log);
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
