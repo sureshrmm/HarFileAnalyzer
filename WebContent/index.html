@@ -67,7 +67,7 @@
                     <a href="#report" data-toggle="tab" ng-click="showReportTab();">Report</a>
                 </li>
                 <li id="compareReleasesTab">
-                    <a href="#compareReleases" data-toggle="tab" ng-click="showCompareReleasesTab();">Compare Releases</a>
+                    <a href="#compareReleases" data-toggle="tab" ng-click="showCompareReleasesTab();">Compare</a>
                 </li>
             </ul>
 
@@ -80,45 +80,47 @@
                         <div class="col-lg-6 col-sm-6 col-6" style="text-align:right" ng-if="downloadURL">
                             <a id="downloadHAR" ng-href="{{downloadURL}}" download href="javascript:void(0);"><img src="assets/images/download.png" style="width:33px; height:33px;"/></a>
                         </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="wptURLLbl">WPT URL</h4>
-                                <div class="input-group-md">
-                                    <input type="text" class="form-control" id="wptURL">
+                        <form>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="wptURLLbl">WPT URL</h4>
+                                    <div class="input-group-md">
+                                        <input type="text" class="form-control" id="wptURL">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="freleaseNameLbl">Release Name</h4>
-                                <input type="text" class="form-control" ng-model="releaseName" id="releaseName">
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="freleaseNameLbl">Release Name</h4>
+                                    <input type="text" class="form-control" ng-model="releaseName" id="releaseName">
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="selectedEnvLbl">Environment</h4>
+                                    <select ng-if="wptConfig" class="form-control" ng-model="selectedEnv" id="selectedEnv">
+                                        <option value="" selected>Select environment</option>
+                                        <option ng-repeat="environment in wptConfig.environments" value="{{environment}}">{{environment}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="selectedBrowserLbl">Browser</h4>
+                                    <select ng-if="wptConfig" class="form-control" ng-model="selectedBrowser" id="selectedBrowser">
+                                        <option value="" selected>Select browser</option>
+                                        <option ng-repeat="browser in wptConfig.browsers" value="{{browser}}">{{browser}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="selectedBandwidthLbl">Bandwidth</h4>
+                                    <select ng-if="wptConfig" class="form-control" ng-model="selectedBandwidth" id="selectedBandwidth">
+                                        <option value="" selected>Select bandwidth</option>
+                                        <option ng-repeat="bandwidth in wptConfig.bandwidths" value="{{bandwidth}}">{{bandwidth}}</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedEnvLbl">Environment</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedEnv" id="selectedEnv">
-                                    <option value="" selected>Select environment</option>
-                                    <option ng-repeat="environment in wptConfig.environments" value="{{environment}}">{{environment}}</option>
-                                </select>
+                            <div class="col-lg-12 col-sm-12 col-12 pt15">
+                                <button type="button" class="btn btn-primary pull-right" ng-click="validateDownloadHarFiles();">Download</button>
+                                <input class="btn btn-default pull-right mr15" type="reset" value="Cancel" />
                             </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedBrowserLbl">Browser</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBrowser" id="selectedBrowser">
-                                    <option value="" selected>Select browser</option>
-                                    <option ng-repeat="browser in wptConfig.browsers" value="{{browser}}">{{browser}}</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedBandwidthLbl">Bandwidth</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBandwidth" id="selectedBandwidth">
-                                    <option value="" selected>Select bandwidth</option>
-                                    <option ng-repeat="bandwidth in wptConfig.bandwidths" value="{{bandwidth}}">{{bandwidth}}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12 pt15">
-                            <button type="button" class="btn btn-primary pull-right" ng-click="validateDownloadHarFiles();">Download</button>
-                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <div class="tab-pane" id="analyse">
@@ -129,60 +131,62 @@
                         <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
                             <h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
                         </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="firstHARFileLbl">Select first HAR file</h4>
-                                <div class="input-group">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip; <input type="file" style="display: none;" id="firstHARFile" file-model="firstHARFile">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly id="firstHARFileText">
+                        <form>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="firstHARFileLbl">Select first HAR file</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" id="firstHARFile" file-model="firstHARFile">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="firstHARFileText">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="firstHARFileNameLbl">Release name</h4>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="firstHARFileName" id="firstHARFileName">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="firstHARFileIterationLbl">Iteration</h4>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" min="1" ng-model="firstHARFileIteration" id="firstHARFileIteration">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="firstHARFileNameLbl">Release name</h4>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" ng-model="firstHARFileName" id="firstHARFileName">
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="secondHARFileLbl">Select second HAR file</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" id="secondHARFile" file-model="secondHARFile">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="secondHARFileText">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="secondHARFileNameLbl">Release name</h4>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="secondHARFileName" id="secondHARFileName">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 id="secondHARFileIterationLbl">Iteration</h4>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" min="1" ng-model="secondHARFileIteration" id="secondHARFileIteration">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="firstHARFileIterationLbl">Iteration</h4>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" min="1" ng-model="firstHARFileIteration" id="firstHARFileIteration">
-                                </div>
+                            <div class="col-lg-12 col-sm-12 col-12 pt15">
+                                <button type="button" class="btn btn-primary pull-right" ng-click="validateAnalyseHarFilesData();">Analyse</button>
+                                <input class="btn btn-default pull-right mr15" type="reset" value="Cancel" />
                             </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="secondHARFileLbl">Select second HAR file</h4>
-                                <div class="input-group">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip; <input type="file" style="display: none;" id="secondHARFile" file-model="secondHARFile">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly id="secondHARFileText">
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="secondHARFileNameLbl">Release name</h4>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" ng-model="secondHARFileName" id="secondHARFileName">
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="secondHARFileIterationLbl">Iteration</h4>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" min="1" ng-model="secondHARFileIteration" id="secondHARFileIteration">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12 pt15">
-                            <button type="button" class="btn btn-primary pull-right" ng-click="validateAnalyseHarFilesData();">Analyse</button>
-                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
-                        </div>
+                        </form>
                     </div>
                     <div class="container-fluid table-responsive hide" id="analysisReport" style="padding-left: 0;padding-right: 0;">
                         <div class="col-lg-6 col-sm-6 col-6">
@@ -349,26 +353,28 @@
                         <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
                             <h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
                         </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="reportFileLbl">Select Location</h4>
-                                <div class="input-group">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="reportFile">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly id="reportFileText">
+                        <form>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="reportFileLbl">Select Location</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="reportFile">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="reportFileText">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 class="visibility-hidden">Report</h4>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-primary pull-right" ng-click="validateGenerateReportData();">Submit</button>
+                                        <input class="btn btn-default pull-right mr15" type="reset" value="Cancel" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 class="visibility-hidden">Report</h4>
-                                <div class="input-group">
-                                    <button type="button" class="btn btn-primary pull-right" ng-click="validateGenerateReportData();">Submit</button>
-                                    <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="container-fluid table-responsive hide" id="reportData" style="padding-left: 0;padding-right: 0;">
                         <div class="col-lg-2 col-sm-2 col-2">
@@ -418,41 +424,43 @@
                         <div class="col-lg-6 col-sm-6 col-6">
                             <h3>Compare - Release Performance</h3>
                         </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="release1HARLbl">First release HAR location</h4>
-                                <div class="input-group">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release1HARFiles">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly id="release1HARText">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="release2HARLbl">Second release HAR location</h4>
-                                <div class="input-group">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release2HARFiles">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly id="release2HARText">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
+                        <form>
                             <div class="col-lg-12 col-sm-12 col-12">
-                                <h4 class="visibility-hidden">compare</h4>
-                                <div class="input-group pull-right">
-                                    <button type="button" class="btn btn-primary pull-right" ng-click="validateComparisonData();">Compare</button>
-                                    <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="release1HARLbl">First release HAR location</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release1HARFiles">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="release1HARText">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="release2HARLbl">Second release HAR location</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release2HARFiles">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="release2HARText">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-12 col-sm-12 col-12">
+                                    <h4 class="visibility-hidden">compare</h4>
+                                    <div class="input-group pull-right">
+                                        <button type="button" class="btn btn-primary pull-right" ng-click="validateComparisonData();">Compare</button>
+                                        <input class="btn btn-default pull-right mr15" type="reset" value="Cancel" />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
