@@ -134,8 +134,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         window.location.reload();
     };
     $scope.showWPTTab = function() {
-        $(".isactive").fadeOut( "slow", function() {
-            $("#wpt").fadeIn( "slow" );
+        $(".isactive").fadeOut("fast", function() {
+            $("#wpt").fadeIn("slow");
         });
         $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
@@ -150,7 +150,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         });
     };
     $scope.showAnalyseTab = function() {
-        $(".isactive").fadeOut( "slow", function() {
+        $(".isactive").fadeOut("fast", function() {
             $("#analyse").fadeIn("slow");
         });
         $("#report").removeClass("isactive");
@@ -165,8 +165,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#wptTab").removeClass("active");
     };
     $scope.showReportTab = function() {
-        $(".isactive").fadeOut( "slow", function() {
-            $("#report").fadeIn( "slow" );
+        $(".isactive").fadeOut("fast", function() {
+            $("#report").fadeIn("slow");
         });
         $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
@@ -180,8 +180,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#wptTab").removeClass("active");
     };
     $scope.showCompareReleasesTab = function() {
-        $(".isactive").fadeOut( "slow", function() {
-            $("#compareReleases").fadeIn( "slow" );
+        $(".isactive").fadeOut("fast", function() {
+            $("#compareReleases").fadeIn("slow");
         });
         $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
