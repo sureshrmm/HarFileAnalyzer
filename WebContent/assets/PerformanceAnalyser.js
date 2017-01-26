@@ -11,13 +11,14 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         file2.name = $scope.secondHARFileName;
         file2.iteration = $scope.secondHARFileIteration;
         requestData.file2 = file2;
-        var fileUploadserviceURL = "/HarFileAnalyzer/api/getHarAnalysys/";
-        var file1 = $scope.firstHARFile;
-        var file2 = $scope.secondHARFile;
-        var requestData = angular.toJson(requestData);
+        var serviceURL = "/HarFileAnalyzer/api/getHarAnalysys/";
         $scope.message = "";
+        var fd = new FormData();
+        fd.append('file1', $scope.firstHARFile);
+        fd.append('file2', $scope.secondHARFile);
+        fd.append('requestData', angular.toJson(requestData));
         $("#loader").removeClass("hide");
-        perfAnalyserService.uploadFile(file1, file2, requestData, fileUploadserviceURL, function(response) {
+        perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
             $("#loader").addClass("hide");
             if (response) {
                 if (response.data.status !== "200") {
@@ -139,6 +140,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#reportTab").addClass("active");
         $("#reportData").addClass("hide");
         $("#reportForm").removeClass("hide");
+        $("#compareReleases").removeClass("active");
+        $("#compareReleasesTab").removeClass("active");
         $("#wpt").removeClass("active");
         $("#wptTab").removeClass("active");
     };
@@ -149,6 +152,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#analyseTab").addClass("active");
         $("#analysisReport").addClass("hide");
         $("#analysisForm").removeClass("hide");
+        $("#compareReleases").removeClass("active");
+        $("#compareReleasesTab").removeClass("active");
         $("#wpt").removeClass("active");
         $("#wptTab").removeClass("active");
     };
@@ -157,18 +162,33 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#analyseTab").removeClass("active");
         $("#report").removeClass("active");
         $("#reportTab").removeClass("active");
+        $("#compareReleases").removeClass("active");
+        $("#compareReleasesTab").removeClass("active");
         $("#wpt").addClass("active");
         $("#wptTab").addClass("active");
         perfAnalyserService.getService("config/wpt-config.json", function(response) {
             $scope.wptConfig = response.data;
         });
     };
+    $scope.showCompareReleasesTab = function() {
+         $("#analyse").removeClass("active");
+        $("#analyseTab").removeClass("active");
+        $("#report").removeClass("active");
+        $("#reportTab").removeClass("active");
+        $("#wpt").removeClass("active");
+        $("#wptTab").removeClass("active");
+        $("#compareReleases").addClass("active");
+        $("#compareReleasesTab").addClass("active");
+    };
     $scope.generateReport = function() {
-        var requestData = {};
         var files = document.getElementById('reportFile').files;
         var serviceURL = "/HarFileAnalyzer/api/getHarReport/";
+        var fd = new FormData();
+        for (var i in files) {
+            fd.append('files', files[i]);
+        }
         $("#loader").removeClass("hide");
-        perfAnalyserService.reportGenerate(serviceURL, files, function(response) {
+        perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
             $("#loader").addClass("hide");
             response = JSON.parse(response.data.jsonObject);
             $scope.reportData = response;
@@ -282,30 +302,53 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $scope.downloadHarFiles();
         }
     };
+    $scope.compareReleaseHarFiles = function() {
+        var release1HARFiles = document.getElementById('release1HARFiles').files;
+        var release2HARFiles = document.getElementById('release2HARFiles').files;
+        var serviceURL = "/HarFileAnalyzer/api/compareReleases/";
+        var fd = new FormData();
+        for (var i in release1HARFiles) {
+            fd.append('release1HARFiles', release1HARFiles[i]);
+        }
+        for (var i in release2HARFiles) {
+            fd.append('release2HARFiles', release2HARFiles[i]);
+        }
+        $("#loader").removeClass("hide");
+        perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
+            $("#loader").addClass("hide");
+            response = JSON.parse(response.data.jsonObject);
+            $scope.reportData = response;
+            $scope.selectedHarData = $scope.reportData[0];
+            $scope.showReportData();
+        });
+    };
+    $scope.validateComparisonData = function() {
+        var hasError = false;
+        if (!$("#release1HARText").val()) {
+            $("#release1HARLbl").addClass("color-red");
+            $("#release1HARText").addClass("border-red");
+            hasError = true;
+        } else {
+            $("#release1HARLbl").removeClass("color-red");
+            $("#release1HARText").removeClass("border-red");
+        }
+        if (!$("#release2HARText").val()) {
+            $("#release2HARLbl").addClass("color-red");
+            $("#release2HARText").addClass("border-red");
+            hasError = true;
+        } else {
+            $("#release2HARLbl").removeClass("color-red");
+            $("#release2HARText").removeClass("border-red");
+        }
+        if (!hasError) {
+            $scope.compareReleaseHarFiles();
+        }
+    };
     $scope.showWPTTab();
 }]);
 perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
-    this.reportGenerate = function(serviceURL, data, callback){
-        $("#loader").removeClass();
-        var fd = new FormData();
-        for (var i in data) {
-            fd.append('files', data[i]);
-        }
+    this.postMultiPartData = function(serviceURL, formData, callback){
         $http.post(serviceURL, fd, {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        }).then(function successCallback(response){
-            callback(response);
-        }, function errorCallback(response) {
-            callback(response);
-        });
-    };
-    this.uploadFile = function(file1, file2, requestData, uploadUrl, callback){
-        var fd = new FormData();
-        fd.append('file1', file1);
-        fd.append('file2', file2);
-        fd.append('requestData', requestData);
-        $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         }).then(function successCallback(response){

@@ -66,6 +66,9 @@
                 <li id="reportTab">
                     <a href="#report" data-toggle="tab" ng-click="showReportTab();">Report</a>
                 </li>
+                <li id="compareReleasesTab">
+                    <a href="#compareReleases" data-toggle="tab" ng-click="showCompareReleasesTab();">Compare Releases</a>
+                </li>
             </ul>
 
             <div class="tab-content clearfix">
@@ -408,6 +411,48 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="compareReleases">
+                    <div id="compareReleasesForm">
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h3>Compare - Release Performance</h3>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="release1HARLbl">First release HAR location</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release1HARFiles">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="release1HARText">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="release2HARLbl">Second release HAR location</h4>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse&hellip; <input type="file" style="display: none;" webkitdirectory directory id="release2HARFiles">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly id="release2HARText">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <h4 class="visibility-hidden">compare</h4>
+                                <div class="input-group pull-right">
+                                    <button type="button" class="btn btn-primary pull-right" ng-click="validateComparisonData();">Compare</button>
+                                    <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
