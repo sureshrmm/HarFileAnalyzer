@@ -57,7 +57,7 @@
               {{message}}
             </div>
             <ul class="nav nav-pills" style="font-size: 16px">
-            	<li class="active" id="wptTab">
+                <li class="active" id="wptTab">
                     <a href="#wpt" data-toggle="tab" ng-click="showWPTTab();">WPT</a>
                 </li>
                 <li id="analyseTab">
@@ -69,13 +69,62 @@
             </ul>
 
             <div class="tab-content clearfix">
+                <div class="tab-pane active" id="wpt">
+                    <div id="wptForm">
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h3>Download WPT HAR file</h3>
+                        </div>
+                        <div class="col-lg-6 col-sm-6 col-6" style="text-align:right" ng-if="downloadURL">
+                            <a id="downloadHAR" ng-href="{{downloadURL}}" download href="javascript:void(0);"><img src="assets/images/download.png" style="width:33px; height:33px;"/></a>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-6 col-sm-6 col-12">
+                                <h4 id="wptURLLbl">WPT URL</h4>
+                                <div class="input-group-md">
+                                    <input type="text" class="form-control" id="wptURL">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="freleaseNameLbl">Release Name</h4>
+                                <input type="text" class="form-control" ng-model="releaseName" id="releaseName">
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedEnvLbl">Environment</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedEnv" id="selectedEnv">
+                                    <option value="" selected>Select environment</option>
+                                    <option ng-repeat="environment in wptConfig.environments" value="{{environment}}">{{environment}}</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedBrowserLbl">Browser</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBrowser" id="selectedBrowser">
+                                    <option value="" selected>Select browser</option>
+                                    <option ng-repeat="browser in wptConfig.browsers" value="{{browser}}">{{browser}}</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 col-12">
+                                <h4 id="selectedBandwidthLbl">Bandwidth</h4>
+                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBandwidth" id="selectedBandwidth">
+                                    <option value="" selected>Select bandwidth</option>
+                                    <option ng-repeat="bandwidth in wptConfig.bandwidths" value="{{bandwidth}}">{{bandwidth}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-sm-12 col-12 pt15">
+                            <button type="button" class="btn btn-primary pull-right" ng-click="validateDownloadHarFiles();">Download</button>
+                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="tab-pane" id="analyse">
                     <div id="analysisForm">
-                    	<div class="col-lg-6 col-sm-6 col-6">
-                        	<h3>Analyse HAR files</h3>
-                    	</div>
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h3>Analyse HAR files</h3>
+                        </div>
                         <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
-                        	<h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
+                            <h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
                         </div>
                         <div class="col-lg-12 col-sm-12 col-12">
                             <div class="col-lg-6 col-sm-6 col-12">
@@ -90,7 +139,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="firstHARFileNameLbl">File name</h4>
+                                <h4 id="firstHARFileNameLbl">Release name</h4>
                                 <div class="input-group">
                                     <input type="text" class="form-control" ng-model="firstHARFileName" id="firstHARFileName">
                                 </div>
@@ -115,7 +164,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="secondHARFileNameLbl">File name</h4>
+                                <h4 id="secondHARFileNameLbl">Release name</h4>
                                 <div class="input-group">
                                     <input type="text" class="form-control" ng-model="secondHARFileName" id="secondHARFileName">
                                 </div>
@@ -158,7 +207,7 @@
                         <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
                             <thead>
                                 <tr>
-                                    <th class="col-xs-3"></th>
+                                    <th class="col-xs-2"></th>
                                     <th colspan="4" style="text-align:center;background-color: #f5f5f5;">{{release1Name}}</th>
                                     <th colspan="4" style="text-align:center;">{{release2Name}}</th>
                                     <th colspan="2" style="background-color: #f5f5f5;text-align:center;">Difference</th>
@@ -291,11 +340,11 @@
                 </div>
                 <div class="tab-pane" id="report">
                     <div id="reportForm">
-                    	<div class="col-lg-6 col-sm-6 col-6">
-                        	<h3>Generate report</h3>
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h3>Generate report</h3>
                         </div>
                         <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
-                        	<h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
+                            <h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
                         </div>
                         <div class="col-lg-12 col-sm-12 col-12">
                             <div class="col-lg-6 col-sm-6 col-12">
@@ -353,61 +402,12 @@
                                 </tr>
                                 <tr>
                                     <th>90 th Percentile</th>
-                                    <td>{{selectedHarData.onload90thPercentile}}</td>
                                     <td>{{selectedHarData.fullyLoaded90thPercentile}}</td>
+                                    <td>{{selectedHarData.onload90thPercentile}}</td>
                                     <td colspan="4"></td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                <div class="tab-pane active" id="wpt">
-                    <div id="wptForm">
-                    	<div class="col-lg-6 col-sm-6 col-6">
-                        	<h3>Download WPT HAR file</h3>
-                        </div>
-                        <div class="col-lg-6 col-sm-6 col-6" style="text-align:right" ng-if="downloadURL">
-                        	<a id="downloadHAR" ng-href="{{downloadURL}}" download href="javascript:void(0);"><img src="assets/images/download.png" style="width:33px; height:33px;"/></a>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-6 col-sm-6 col-12">
-                                <h4 id="wptURLLbl">WPT URL</h4>
-                                <div class="input-group-md">
-                                    <input type="text" class="form-control" id="wptURL">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12">
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="freleaseNameLbl">Release Name</h4>
-                                <input type="text" class="form-control" ng-model="releaseName" id="releaseName">
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedEnvLbl">Environment</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedEnv" id="selectedEnv">
-                                    <option value="" selected>Select environment</option>
-                                    <option ng-repeat="environment in wptConfig.environments" value="{{environment}}">{{environment}}</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedBrowserLbl">Browser</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBrowser" id="selectedBrowser">
-                                    <option value="" selected>Select browser</option>
-                                    <option ng-repeat="browser in wptConfig.browsers" value="{{browser}}">{{browser}}</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-sm-3 col-12">
-                                <h4 id="selectedBandwidthLbl">Bandwidth</h4>
-                                <select ng-if="wptConfig" class="form-control" ng-model="selectedBandwidth" id="selectedBandwidth">
-                                    <option value="" selected>Select bandwidth</option>
-                                    <option ng-repeat="bandwidth in wptConfig.bandwidths" value="{{bandwidth}}">{{bandwidth}}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-sm-12 col-12 pt15">
-                            <button type="button" class="btn btn-primary pull-right" ng-click="validateDownloadHarFiles();">Download</button>
-                            <button type="button" class="btn btn-default pull-right mr15" ng-click="cancel();">Cancel</button>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 var perfAnalyserApp = angular.module('perfAnalyserApp', []);
 
 perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserService', function PerfAnalyserController($scope, perfAnalyserService) {
-	$scope.analyseHarFiles = function() {
+    $scope.analyseHarFiles = function() {
         var requestData = {};
         var file1 = {};
         file1.name = $scope.firstHARFileName;
@@ -18,14 +18,14 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $scope.message = "";
         $("#loader").removeClass("hide");
         perfAnalyserService.uploadFile(file1, file2, requestData, fileUploadserviceURL, function(response) {
-        	$("#loader").addClass("hide");
-        	if (response) {
-            	if (response.data.status !== "200") {
-            		$scope.message = response.data.message;
-            		$("#errorMessage").removeClass("hide");
-            	} else {
+            $("#loader").addClass("hide");
+            if (response) {
+                if (response.data.status !== "200") {
+                    $scope.message = response.data.message;
+                    $("#errorMessage").removeClass("hide");
+                } else {
                     $scope.showAnalyseResponse(JSON.parse(response.data.jsonObject));
-            	}
+                }
             }
         });
     };
@@ -34,8 +34,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $scope.showMatchedURLsData();
     };
     $scope.showMatchedURLsData = function() {
-    	if ($scope.analyseData && $scope.analyseData.matchedURLs) {
-    		$("#analysisForm").addClass("hide");
+        if ($scope.analyseData && $scope.analyseData.matchedURLs) {
+            $("#analysisForm").addClass("hide");
             $("#analysisReport").removeClass("hide");
             $("#matchedURLs").removeClass("hide");
             $("#unmatchedURLs").addClass("hide");
@@ -177,11 +177,11 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         });
     };
     $scope.showReportData = function() {
-    	$("#reportForm").addClass("hide");
+        $("#reportForm").addClass("hide");
         $("#reportData").removeClass("hide");
-    	$('#page-selection').bootpag({
+        $('#page-selection').bootpag({
             total: $scope.reportData.length,
-            maxVisible : 4,
+            maxVisible : 2,
         }).on("page", function(event, num){
             $scope.selectedHarData = $scope.reportData[num-1];
             $scope.$apply();
@@ -231,9 +231,9 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         perfAnalyserService.postSerive(serviceURL, requestData, function(response) {
             $("#loader").addClass("hide");
             $scope.downloadURL = response.data.jsonObject;
-			setTimeout(function(){
-				$("#downloadHAR")[0].click();
-			}, 500)
+            setTimeout(function(){
+                $("#downloadHAR")[0].click();
+            }, 500)
         });
     };
     $scope.validateDownloadHarFiles = function() {
@@ -282,22 +282,22 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $scope.downloadHarFiles();
         }
     };
-	$scope.showWPTTab();
+    $scope.showWPTTab();
 }]);
 perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
     this.reportGenerate = function(serviceURL, data, callback){
         $("#loader").removeClass();
         var fd = new FormData();
         for (var i in data) {
-        	fd.append('files', data[i]);
+            fd.append('files', data[i]);
         }
         $http.post(serviceURL, fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         }).then(function successCallback(response){
-        	callback(response);
+            callback(response);
         }, function errorCallback(response) {
-        	callback(response);
+            callback(response);
         });
     };
     this.uploadFile = function(file1, file2, requestData, uploadUrl, callback){
@@ -309,25 +309,25 @@ perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         }).then(function successCallback(response){
-        	callback(response);
+            callback(response);
         }, function errorCallback(response) {
-        	callback(response);
+            callback(response);
         });
     };
     this.getService = function(url, callback){
         $http.get(url)
         .then(function successCallback(response){
-        	callback(response);
+            callback(response);
         }, function errorCallback(response) {
-        	callback(response);
+            callback(response);
         });
     };
     this.postSerive = function(serviceURL, requestData, callback){
         $http.post(serviceURL, requestData)
         .then(function successCallback(response){
-        	callback(response);
+            callback(response);
         }, function errorCallback(response) {
-        	callback(response);
+            callback(response);
         });
     };
 }]);
