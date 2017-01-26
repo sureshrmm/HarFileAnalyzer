@@ -348,7 +348,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
 }]);
 perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
     this.postMultiPartData = function(serviceURL, formData, callback){
-        $http.post(serviceURL, fd, {
+        $http.post(serviceURL, formData, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         }).then(function successCallback(response){
