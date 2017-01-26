@@ -133,51 +133,63 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
     $scope.cancel = function() {
         window.location.reload();
     };
-    $scope.showReportTab = function() {
-        $("#analyse").removeClass("active");
-        $("#analyseTab").removeClass("active");
-        $("#report").addClass("active");
-        $("#reportTab").addClass("active");
-        $("#reportData").addClass("hide");
-        $("#reportForm").removeClass("hide");
-        $("#compareReleases").removeClass("active");
-        $("#compareReleasesTab").removeClass("active");
-        $("#wpt").removeClass("active");
-        $("#wptTab").removeClass("active");
-    };
-    $scope.showAnalyseTab = function() {
-        $("#report").removeClass("active");
-        $("#reportTab").removeClass("active");
-        $("#analyse").addClass("active");
-        $("#analyseTab").addClass("active");
-        $("#analysisReport").addClass("hide");
-        $("#analysisForm").removeClass("hide");
-        $("#compareReleases").removeClass("active");
-        $("#compareReleasesTab").removeClass("active");
-        $("#wpt").removeClass("active");
-        $("#wptTab").removeClass("active");
-    };
     $scope.showWPTTab = function() {
-        $("#analyse").removeClass("active");
+        $(".isactive").fadeOut( "slow", function() {
+            $("#wpt").fadeIn( "slow" );
+        });
+        $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
-        $("#report").removeClass("active");
+        $("#report").removeClass("isactive");
         $("#reportTab").removeClass("active");
-        $("#compareReleases").removeClass("active");
+        $("#compareReleases").removeClass("isactive");
         $("#compareReleasesTab").removeClass("active");
-        $("#wpt").addClass("active");
+        $("#wpt").addClass("isactive");
         $("#wptTab").addClass("active");
         perfAnalyserService.getService("config/wpt-config.json", function(response) {
             $scope.wptConfig = response.data;
         });
     };
-    $scope.showCompareReleasesTab = function() {
-         $("#analyse").removeClass("active");
-        $("#analyseTab").removeClass("active");
-        $("#report").removeClass("active");
+    $scope.showAnalyseTab = function() {
+        $(".isactive").fadeOut( "slow", function() {
+            $("#analyse").fadeIn("slow");
+        });
+        $("#report").removeClass("isactive");
         $("#reportTab").removeClass("active");
-        $("#wpt").removeClass("active");
+        $("#analyse").addClass("isactive");
+        $("#analyseTab").addClass("active");
+        $("#analysisReport").addClass("hide");
+        $("#analysisForm").removeClass("hide");
+        $("#compareReleases").removeClass("isactive");
+        $("#compareReleasesTab").removeClass("active");
+        $("#wpt").removeClass("isactive");
         $("#wptTab").removeClass("active");
-        $("#compareReleases").addClass("active");
+    };
+    $scope.showReportTab = function() {
+        $(".isactive").fadeOut( "slow", function() {
+            $("#report").fadeIn( "slow" );
+        });
+        $("#analyse").removeClass("isactive");
+        $("#analyseTab").removeClass("active");
+        $("#report").addClass("isactive");
+        $("#reportTab").addClass("active");
+        $("#reportData").addClass("hide");
+        $("#reportForm").removeClass("hide");
+        $("#compareReleases").removeClass("isactive");
+        $("#compareReleasesTab").removeClass("active");
+        $("#wpt").removeClass("isactive");
+        $("#wptTab").removeClass("active");
+    };
+    $scope.showCompareReleasesTab = function() {
+        $(".isactive").fadeOut( "slow", function() {
+            $("#compareReleases").fadeIn( "slow" );
+        });
+        $("#analyse").removeClass("isactive");
+        $("#analyseTab").removeClass("active");
+        $("#report").removeClass("isactive");
+        $("#reportTab").removeClass("active");
+        $("#wpt").removeClass("isactive");
+        $("#wptTab").removeClass("active");
+        $("#compareReleases").addClass("isactive");
         $("#compareReleasesTab").addClass("active");
     };
     $scope.generateReport = function() {
