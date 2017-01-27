@@ -100,14 +100,14 @@ public class DownloadHar {
 			Date dateobj = new Date();
 			currentTime = df.format(dateobj);
 			zipIt(directory + File.separator + "harFiles" + currentTime +".zip", temp);
-			
+			FileUtils.deleteDirectory(temp);
 			log.info("Application Ended!----------------------------------------------");
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info("Error : " + e.getMessage());
 			return "Error";
 		}
-		return "harFiles" + File.separator + "harFiles" + currentTime + ".zip";
+		return "downloads" + File.separator + "harFiles" + currentTime + ".zip";
 	}
 
 	public static String getTestURL(String line) {

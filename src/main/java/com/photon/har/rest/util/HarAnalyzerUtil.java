@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,18 +21,19 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 
-import de.sstoehr.harreader.model.HarEntry;
-import de.sstoehr.harreader.model.HarHeader;
-import de.sstoehr.harreader.model.HarPage;
+import com.photon.har.rest.ResponseBean;
+
+import edu.umass.cs.benchlab.har.HarEntry;
+import edu.umass.cs.benchlab.har.HarHeader;
+import edu.umass.cs.benchlab.har.HarPage;
 
 public class HarAnalyzerUtil {
 
-	private static File f;
+	private static File reportFile;
 	private static File workingFolder;
-	private static int firstPageOnload = 0;
-	private static int secondPageOnLoad = 0;
+	private static long firstPageOnload = 0;
+	private static long secondPageOnLoad = 0;
 	private static List<String> sheet1cellHeaders;
 	private static List<String> sheet2CellHeader;
 	private static List<String> sheet3Cells;
@@ -45,16 +48,19 @@ public class HarAnalyzerUtil {
 	private static JSONArray contentDifference = new JSONArray();
 	private static JSONArray notMatchedURLsArray = new JSONArray();
 	private static JSONObject thirdsheetContent = new JSONObject();
+	private static String downloadFile;
 	
-
 	static {
-		File currentFolder = new File(".");
-		workingFolder = new File(currentFolder, "WebPageReport_XLS");
+		workingFolder = getDownoadsDirectory();
 		if (!workingFolder.exists()) {
 			workingFolder.mkdir();
 		}
 		System.out.println(workingFolder.getAbsolutePath());
-		f = new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls");
+		DateFormat df = new SimpleDateFormat("ddMMYYYYHHmmss");
+		Date dateobj = new Date();
+		String curentTime = df.format(dateobj);
+		downloadFile = "harAnalysys" + curentTime + ".xls";
+		reportFile = new File(workingFolder.getAbsolutePath() + "\\" + downloadFile);
 
 		sheet1cellHeaders = new ArrayList<String>();
 		sheet1cellHeaders.add("URL");
@@ -92,32 +98,17 @@ public class HarAnalyzerUtil {
 	}
 
 	public static void createOutputFolderNewXlsFile(HarPage firstPage, String FirstHarFileName, HarPage secondPage, String secondHarFileName) throws IOException {
-
 		firstPageOnload = firstPage.getPageTimings().getOnLoad();
 		secondPageOnLoad = secondPage.getPageTimings().getOnLoad();
 
 		firstHarName = FirstHarFileName;
 		secondHarName = secondHarFileName;
-		
-		if (f.exists()) {
-
-			System.out.println("File already exists>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-			f.delete();
-			System.out.println("File Deleted Succesfully.....................................................");
-			createXLSHeaderColumnName(); // create new file
-											// folder.........................
-		} else {
-
-			System.out.print("FILE NOT FOUND!!!!: ");
-			createXLSHeaderColumnName(); // create new file
-											// folder.........................
-			System.out.println("SUCCESSFULLY Created New XlS File............................................");
-		}
+		createXLSHeaderColumnName();
 	}
 
 	public static void createXLSHeaderColumnName() {
 		try {
-			FileOutputStream fileOut = new FileOutputStream(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls");
+			FileOutputStream fileOut = new FileOutputStream(reportFile);
 			HSSFWorkbook workbook = new HSSFWorkbook();
 			HSSFSheet worksheet1 = workbook.createSheet("Matched_Urls");
 			HSSFRow sheetoneTitleRow = worksheet1.createRow((short) 0);
@@ -201,7 +192,7 @@ public class HarAnalyzerUtil {
 		}
 	}
 
-	public static JSONObject xlsReadWriteUpdate(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList)
+	public static ResponseBean xlsReadWriteUpdate(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList)
 			throws IOException, JSONException {
 		String baseUrl = firstEntryList.get(0).getRequest().getUrl();
 		baseUrl = baseUrl.split("/")[2];
@@ -301,11 +292,12 @@ public class HarAnalyzerUtil {
 		rootObject.put("matchedURLs", firstReleaseObject);
 		rootObject.put("notMatchedURLs", notMatchedList);
 		rootObject.put("totalComparision", thirdSheet);
-		
-		
-		
-		System.out.println("rootObject=========> " + rootObject.toString());
-		return rootObject;
+		ResponseBean responseBean = new ResponseBean();
+		responseBean.setStatus(200);
+		responseBean.setMessage("Success");
+		responseBean.setJsonObject(rootObject.toString());
+		responseBean.setDownloadUrl("downloads" + File.separator + downloadFile);
+		return responseBean;
 	}
 
 	private static void removeHarEntry(List<HarEntry> firstEntryList, List<HarEntry> secondEntryList,
@@ -320,8 +312,7 @@ public class HarAnalyzerUtil {
 
 	private static void writeThirdSheet(List<HarEntry> harEntries, int col) {
 		try {
-			FileInputStream fsIP = new FileInputStream(
-					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+			FileInputStream fsIP = new FileInputStream(reportFile);
 
 			HSSFWorkbook wb = new HSSFWorkbook(fsIP);
 			HSSFSheet worksheet = wb.getSheetAt(2);
@@ -341,7 +332,8 @@ public class HarAnalyzerUtil {
 			int othersCount = 0;
 
 			for (HarEntry harEntry : harEntries) {
-				List<HarHeader> headers = harEntry.getResponse().getHeaders();
+				harEntry.getResponse().getHeaders();
+				List<HarHeader> headers = harEntry.getResponse().getHeaders().getHeaders();
 				for (HarHeader harHeader : headers) {
 					if ("Content-Type".equals(harHeader.getName()) && harHeader.getValue().startsWith("text/html")) {
 						htmlCount = htmlCount + 1;
@@ -424,8 +416,7 @@ public class HarAnalyzerUtil {
 			thirdsheetContent.put("othersCount", othersCount);
 			
 
-			FileOutputStream output_file = new FileOutputStream(
-					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+			FileOutputStream output_file = new FileOutputStream(reportFile);
 
 			wb.write(output_file); // write changes
 
@@ -446,8 +437,7 @@ public class HarAnalyzerUtil {
 
 	private static void writeSecondSheet(HarEntry harEntry, List<HarEntry> addedList, String harName) {
 		try {
-			FileInputStream fsIP = new FileInputStream(
-					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+			FileInputStream fsIP = new FileInputStream(reportFile);
 
 			addedList.add(harEntry);
 
@@ -477,7 +467,7 @@ public class HarAnalyzerUtil {
 			cell = row.createCell(2);
 			cell.setCellValue(harEntry.getResponse().getStatus());
 
-			int time = harEntry.getTime();
+			long time = harEntry.getTime();
 			String ConvertedTime = time + "ms";
 			if (time >= 1000) {
 				double ss = time / 1000.0;
@@ -496,8 +486,8 @@ public class HarAnalyzerUtil {
 			cell.setCellValue(ConvertedFileSize);
 
 			cell = row.createCell(5);
-			Date startedDateTime = harEntry.getStartedDateTime();
-			long onloadtime = startedDateTime.getTime();
+			String loadStarts = harEntry.getCustomFields().getCustomFieldValue("_load_start");
+			long onloadtime = Long.parseLong(loadStarts);
 			String onload = "";
 			if (firstPageOnload > onloadtime) {
 				onload = "BEFORE";
@@ -514,8 +504,7 @@ public class HarAnalyzerUtil {
 			jsonObject.put("onload", onload);
 			notMatchedURLsArray.put(jsonObject);
 
-			FileOutputStream output_file = new FileOutputStream(
-					new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+			FileOutputStream output_file = new FileOutputStream(reportFile);
 
 			wb.write(output_file); // write changes
 
@@ -527,7 +516,6 @@ public class HarAnalyzerUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -547,8 +535,7 @@ public class HarAnalyzerUtil {
 		firstAddedList.add(firstEntry);
 		secondAddedList.add(secondEntry);
 
-		FileInputStream fsIP = new FileInputStream(
-				new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+		FileInputStream fsIP = new FileInputStream(reportFile);
 
 		HSSFWorkbook wb = new HSSFWorkbook(fsIP);
 		HSSFSheet worksheet = wb.getSheetAt(0);
@@ -558,8 +545,8 @@ public class HarAnalyzerUtil {
 		// System.out.println(lastRow);
 
 		HSSFRow row = worksheet.createRow((short) lastRow + 1);
-		Integer firstTime = null;
-		Integer secondEntryTime = null;
+		Long firstTime = null;
+		Long secondEntryTime = null;
 		Long firstEntryFileSize = null;
 		Long secondEntryFileSize = null;
 		String firstTimeTaken = "";
@@ -599,8 +586,8 @@ public class HarAnalyzerUtil {
 			cell.setCellValue(firstFileSize);
 
 			cell = row.createCell(4);
-			Date startedDateTime = firstEntry.getStartedDateTime();
-			long time = startedDateTime.getTime();
+			String loadStarts = firstEntry.getCustomFields().getCustomFieldValue("_load_start");
+			long time = Long.parseLong(loadStarts);
 			if (firstPageOnload > time) {
 				firstOnload = "BEFORE";
 			} else {
@@ -636,8 +623,8 @@ public class HarAnalyzerUtil {
 			cell.setCellValue(secondFileSize);
 
 			cell = row.createCell(9);
-			Date startedDateTime = secondEntry.getStartedDateTime();
-			long time = startedDateTime.getTime();
+			String loadStarts = secondEntry.getCustomFields().getCustomFieldValue("_load_start");
+			long time = Long.parseLong(loadStarts);
 			if (secondPageOnLoad > time) {
 				secondOnload = "BEFORE";
 			} else {
@@ -647,7 +634,7 @@ public class HarAnalyzerUtil {
 		}
 		if (machedUrl) {
 			HSSFCell cell = row.createCell(10);
-			int timeDiff = secondEntryTime - firstTime;
+			long timeDiff = secondEntryTime - firstTime;
 			timeDifference = timeDiff + "ms";
 			if (timeDiff >= 1000) {
 				double ss = timeDiff / 1000.0;
@@ -698,8 +685,7 @@ public class HarAnalyzerUtil {
 		difference.put("sizeDiff", sizeDifference);
 		contentDifference.put(difference);
 
-		FileOutputStream output_file = new FileOutputStream(
-				new File(workingFolder.getAbsolutePath() + "\\" + "report" + ".xls"));
+		FileOutputStream output_file = new FileOutputStream(reportFile);
 
 		wb.write(output_file); // write changes
 
@@ -741,5 +727,9 @@ public class HarAnalyzerUtil {
 		}
 		return url;
 	}
-
+	public static File getDownoadsDirectory() {
+		String property = System.getProperty("user.dir");
+		File rootDir = new File(property);
+		return new File(rootDir.getParent() + File.separator + "webapps" + File.separator + "HarFileAnalyzer/downloads/");
+	}
 }

@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +36,11 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.FormDataParam;
 
-import de.sstoehr.harreader.HarReader;
-import de.sstoehr.harreader.HarReaderException;
-import de.sstoehr.harreader.model.Har;
-import de.sstoehr.harreader.model.HarEntry;
-import de.sstoehr.harreader.model.HarPage;
+import edu.umass.cs.benchlab.har.HarEntry;
+import edu.umass.cs.benchlab.har.HarLog;
+import edu.umass.cs.benchlab.har.HarPage;
+import edu.umass.cs.benchlab.har.HarWarning;
+import edu.umass.cs.benchlab.har.tools.HarFileReader;
 
 @Path("/")
 public class HarFileAnalyzer {
@@ -72,9 +75,8 @@ public class HarFileAnalyzer {
 
 	private Response getHarAnalysys(String firstHarfileLocation, String secondHarfileLocation, JSONObject jsonObject) {
 		ResponseBean bean = new ResponseBean();
-		JSONObject JsonResponse = null;
 		try {
-			HarReader harReader = new HarReader();
+			HarFileReader harReader = new HarFileReader();
 			File tempDir = new File(".");
 			tempDir = new File(tempDir + "/tempDir");
 			JSONObject request1 = jsonObject.getJSONObject("file1");
@@ -85,22 +87,19 @@ public class HarFileAnalyzer {
 			String secondHarName = request2.get("name").toString();
 			String secondHarIteration = request2.get("iteration").toString();
 
-			// String firstHarName = getProperty("firstHarName");
-			// String secondHarName = getProperty("secondHarName");
+			List<HarWarning> harWarnings = new ArrayList<HarWarning>();
+			
+			HarLog firstHarLog = harReader.readHarFile(new File(tempDir + "/" + firstHarfileLocation), harWarnings);
+			List<HarEntry> entries = firstHarLog.getEntries().getEntries();
 
-			Har firstHar = harReader.readFromFile(new File(tempDir + "/" + firstHarfileLocation));
-			List<HarEntry> entries = firstHar.getLog().getEntries();
+			HarLog secondHarLog = harReader.readHarFile(new File(tempDir + "/" + secondHarfileLocation), harWarnings);
+			List<HarEntry> entries1 = secondHarLog.getEntries().getEntries();
 
-			Har secondHar = harReader.readFromFile(new File(tempDir + "/" + secondHarfileLocation));
-			List<HarEntry> entries1 = secondHar.getLog().getEntries();
-
-			List<HarPage> firstPages = firstHar.getLog().getPages();
-			List<HarPage> secondPages = secondHar.getLog().getPages();
+			List<HarPage> firstPages = firstHarLog.getPages().getPages();
+			List<HarPage> secondPages = secondHarLog.getPages().getPages();
 			HarPage firstPage = null;
 			HarPage secondPage = null;
-			// String firstHarIteration = getProperty("firstHarIteration");
 			String firstPageName = "page_" + firstHarIteration + "_0";
-			// String secondHarIteration = getProperty("secondHarIteration");
 			String secondPageName = "page_" + secondHarIteration + "_0";
 			for (HarPage harPage : firstPages) {
 				if (firstPageName.equals(harPage.getId())) {
@@ -119,28 +118,21 @@ public class HarFileAnalyzer {
 			List<HarEntry> secondEntry = new ArrayList<HarEntry>();
 
 			for (HarEntry entry : entries) {
-				String pageref = entry.getPageref();
+				String pageref = entry.getPageRef();
 				if (firstPageName.equals(pageref)) {
 					firstEntry.add(entry);
 				}
 			}
 			for (HarEntry entry : entries1) {
-				String pageref = entry.getPageref();
+				String pageref = entry.getPageRef();
 				if (secondPageName.equals(pageref)) {
 					secondEntry.add(entry);
 				}
 			}
 
-			JsonResponse = HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
-			bean.setStatus(200);
-			bean.setMessage("Success");
-			bean.setJsonObject(JsonResponse.toString());
-			return Response.status(200).entity(bean).build();
-		} catch (HarReaderException e) {
-			bean.setStatus(301);
-			bean.setMessage(e.getLocalizedMessage());
-			return Response.status(301).entity(bean).build();
-		} catch (IOException e) {
+			ResponseBean responseBean = HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
+			return Response.status(200).entity(responseBean).build();
+		}  catch (IOException e) {
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
 			return Response.status(301).entity(bean).build();
@@ -156,10 +148,12 @@ public class HarFileAnalyzer {
 	public Response getHarReport(FormDataMultiPart multipart) {
 
 		JSONArray rootArray = new JSONArray();
+		String reportFile;
 		try {
 			List<FormDataBodyPart> fields = multipart.getFields("files");
 			for (int i = 0; i < fields.size(); i++) {
 				BodyPartEntity bodyPartEntity = (BodyPartEntity) fields.get(i).getEntity();
+				System.out.println("fields.get(i) : " + fields.get(i).getContentDisposition().getFileName());
 				String fileName = fields.get(i).getContentDisposition().getFileName();
 				if (fileName != null && fileName != "") {
 					String[] split = fileName.split("/");
@@ -174,7 +168,11 @@ public class HarFileAnalyzer {
 			String harfileLocation = tempDir.getAbsolutePath();
 			File harFiles = new File(harfileLocation);
 			File[] listFiles = harFiles.listFiles();
-			HarReportUtil harReportUtil = new HarReportUtil("harReport");
+			DateFormat df = new SimpleDateFormat("ddMMYYYYHHmmss");
+			Date dateobj = new Date();
+			String curentTime = df.format(dateobj);
+			reportFile = "harReport" + curentTime + ".xls";
+			HarReportUtil harReportUtil = new HarReportUtil(reportFile);
 			for (File file : listFiles) {
 				harReportUtil.createReportHeader(file);
 				JSONObject writeReportData = harReportUtil.writeReportData(file, null);
@@ -188,6 +186,7 @@ public class HarFileAnalyzer {
 		bean.setStatus(200);
 		bean.setMessage("Success");
 		bean.setJsonObject(rootArray.toString());
+		bean.setDownloadUrl("downloads" + File.separator + reportFile);
 		return Response.status(200).entity(bean).build();
 	}
 
@@ -241,11 +240,7 @@ public class HarFileAnalyzer {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			StringBuilder builder = new StringBuilder();
 			
-			String property = System.getProperty("user.dir");
-			File rootDir = new File(property);
-			String zipDir = rootDir.getParent() + File.separator + "webapps" + File.separator + "HarFileAnalyzer/harFiles/";
-			File zipLoc = new File(zipDir);
-			System.out.println("Root Path======>" + zipLoc);
+			File zipDir = HarAnalyzerUtil.getDownoadsDirectory();
 			
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -257,9 +252,9 @@ public class HarFileAnalyzer {
 			String environment = jsonObject.get("environment").toString();
 			String browser = jsonObject.get("browser").toString();
 			String bandwidth = jsonObject.get("bandwidth").toString();
-			String downloadHarFile = DownloadHar.downloadHarFile(wptURL, zipDir, releaseName, browser, environment, bandwidth);
+			String downloadHarFile = DownloadHar.downloadHarFile(wptURL, zipDir.getAbsolutePath(), releaseName, browser, environment, bandwidth);
 			ResponseBean bean = new ResponseBean();
-			bean.setJsonObject(downloadHarFile);
+			bean.setDownloadUrl(downloadHarFile);
 			bean.setStatus(200);
 			bean.setMessage("Success");
 			return Response.status(200).entity(bean).build();
@@ -271,7 +266,7 @@ public class HarFileAnalyzer {
 		}
 		return null;
 	}
-	
+
 	@GET
 	@Path("/harComparision")
 	@Consumes(MediaType.APPLICATION_JSON)

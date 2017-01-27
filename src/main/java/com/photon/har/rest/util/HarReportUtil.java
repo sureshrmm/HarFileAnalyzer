@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,15 +43,14 @@ public class HarReportUtil {
 	//private static JSONObject harNameObject = new JSONObject();;
 	
 	public HarReportUtil(String fileName) {
-		File currentFolder = new File(".");
-		workingFolder = new File(currentFolder, "WebPageReport_XLS");
+		workingFolder = HarAnalyzerUtil.getDownoadsDirectory();
 		if (!workingFolder.exists()) {
 			workingFolder.mkdir();
 		}
 		onloadTimeMap = new HashMap<String, Double>();
 		pageloadTimeMap = new HashMap<String, Double>();
 		this.fileName = fileName;
-		reportFile = new File(workingFolder.getAbsolutePath() + "\\" + this.fileName + ".xls");
+		reportFile = new File(workingFolder.getAbsolutePath() + "\\" + fileName);
 		workbook = new HSSFWorkbook();
 		
 		System.out.println(workingFolder.getAbsolutePath());

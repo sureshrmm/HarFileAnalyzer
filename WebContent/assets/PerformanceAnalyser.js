@@ -26,6 +26,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
                     $("#errorMessage").removeClass("hide");
                 } else {
                     $scope.showAnalyseResponse(JSON.parse(response.data.jsonObject));
+                    $scope.downloadHarAnalysysUrl = response.data.downloadUrl;
                 }
             }
         });
@@ -202,6 +203,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#loader").removeClass("hide");
         perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
             $("#loader").addClass("hide");
+            $scope.downloadHarReportUrl = response.data.downloadUrl;
             response = JSON.parse(response.data.jsonObject);
             $scope.reportData = response;
             $scope.selectedHarData = $scope.reportData[0];
@@ -262,7 +264,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#loader").removeClass("hide");
         perfAnalyserService.postSerive(serviceURL, requestData, function(response) {
             $("#loader").addClass("hide");
-            $scope.downloadURL = response.data.jsonObject;
+            $scope.downloadURL = response.data.downloadUrl;
             setTimeout(function(){
                 $("#downloadHAR")[0].click();
             }, 500)

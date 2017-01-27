@@ -129,7 +129,10 @@
                             <h3>Analyse HAR files</h3>
                         </div>
                         <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
-                            <h5><a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a></h5>
+                            <h5>
+                            	<a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a><span> | </span>
+                            	<a ng-if="downloadHarAnalysysUrl" ng-href="{{downloadHarAnalysysUrl}}" download href="javascript:void(0);">Download Report</a>
+                            </h5>
                         </div>
                         <form>
                             <div class="col-lg-12 col-sm-12 col-12">
@@ -351,7 +354,10 @@
                             <h3>Generate report</h3>
                         </div>
                         <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
-                            <h5><a ng-click="showReportData()" href="javascript:void(0);">View report</a></h5>
+                            <h5>
+                            	<a ng-click="showReportData()" href="javascript:void(0);">View report</a><span> | </span>
+                            	<a ng-if="downloadHarReportUrl" ng-href="{{downloadHarReportUrl}}" download href="javascript:void(0);">Download Report</a>
+                            </h5>
                         </div>
                         <form>
                             <div class="col-lg-12 col-sm-12 col-12">
