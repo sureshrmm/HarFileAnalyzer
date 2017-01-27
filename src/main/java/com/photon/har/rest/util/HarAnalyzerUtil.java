@@ -41,13 +41,13 @@ public class HarAnalyzerUtil {
 	private static String secondHarName;
 	private static boolean firstwritten = false;
 	private static boolean secondwritten = false;
-	private static JSONObject firstReleaseObject = new JSONObject();
-	private static JSONArray firstContentArray = new JSONArray();
-	private static JSONArray secondContentArray = new JSONArray();
-	private static JSONObject rootObject = new JSONObject();
-	private static JSONArray contentDifference = new JSONArray();
-	private static JSONArray notMatchedURLsArray = new JSONArray();
-	private static JSONObject thirdsheetContent = new JSONObject();
+	private static JSONObject firstReleaseObject = null;
+	private static JSONArray firstContentArray = null;
+	private static JSONArray secondContentArray = null;
+	private static JSONObject rootObject = null;
+	private static JSONArray contentDifference = null;
+	private static JSONArray notMatchedURLsArray = null;
+	private static JSONObject thirdsheetContent = null;
 	private static String downloadFile;
 	
 	static {
@@ -103,6 +103,15 @@ public class HarAnalyzerUtil {
 
 		firstHarName = FirstHarFileName;
 		secondHarName = secondHarFileName;
+		
+		firstReleaseObject = new JSONObject();
+		firstContentArray = new JSONArray();
+		secondContentArray = new JSONArray();
+		rootObject = new JSONObject();
+		contentDifference = new JSONArray();
+		notMatchedURLsArray = new JSONArray();
+		thirdsheetContent = new JSONObject();
+		
 		createXLSHeaderColumnName();
 	}
 

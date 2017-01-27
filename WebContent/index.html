@@ -194,7 +194,7 @@
                     <div class="container-fluid table-responsive hide" id="analysisReport" style="padding-left: 0;padding-right: 0;">
                         <div class="col-lg-6 col-sm-6 col-6">
                             <h5>
-                                <a href="javascript:void(0);" ng-click="showAnalyseTab();">
+                                <a href="javascript:void(0);" ng-click="showAnalyseTab(false);">
                                     <span style="font-size:12px;">&#10094;</span> Back
                                 </a>
                             </h5>
@@ -204,8 +204,8 @@
                                 <a href="javascript:void(0);" ng-click="showMatchedURLsData();" id="matchedURLsLink">
                                     Matched URLs
                                 </a>
-                                <span> | </span>
-                                <a href="javascript:void(0);" ng-click="showUnmatchedURLsData();" style="font-weight: normal;" id="unmatchedURLsLink">
+                                <span ng-if="analyseData.notMatchedURLs[release1Name].length > 0 || analyseData.notMatchedURLs[release2Name].length > 0"> | </span>
+                                <a href="javascript:void(0);" ng-click="showUnmatchedURLsData();" style="font-weight: normal;" id="unmatchedURLsLink" ng-if="analyseData.notMatchedURLs[release1Name].length > 0 || analyseData.notMatchedURLs[release2Name].length > 0">
                                     Unmatched URLs
                                 </a>
                                 <span> | </span>
@@ -247,8 +247,8 @@
                                     <td>{{release2Details[$index].timeTaken}}</td>
                                     <td>{{release2Details[$index].fileSize}}</td>
                                     <td>{{release2Details[$index].onload}}</td>
-                                    <td style="background-color: #f5f5f5;">{{differences[$index].timeDiff}}</td>
-                                    <td style="background-color: #f5f5f5;">{{differences[$index].sizeDiff}}</td>
+                                    <td style="background-color: #f5f5f5;" ng-class="differences[$index].timeDiff.indexOf('-') == -1 && differences[$index].timeDiff != '0ms' ? 'color-red' : ''">{{differences[$index].timeDiff}}</td>
+                                    <td style="background-color: #f5f5f5;" ng-class="differences[$index].sizeDiff.indexOf('-') == -1 && differences[$index].sizeDiff != '0b' ? 'color-red' : ''">{{differences[$index].sizeDiff}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -263,20 +263,20 @@
                                 </tr> 
                             </thead>
                             <tbody>
-                                <tr style="text-align: center;">
+                                <tr style="text-align: center;" ng-if="release1Details.length > 0">
                                     <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release1Name}}</h4></td>
                                 </tr>
-                                <tr ng-repeat="release1Detail in release1Details">
+                                <tr ng-if="release1Details.length > 0" ng-repeat="release1Detail in release1Details">
                                     <td title="{{release1Detail.url}}" class="ellipsis">{{release1Detail.url}}</td>
                                     <td>{{release1Detail.responseCode}}</td>
                                     <td>{{release1Detail.timeTaken}}</td>
                                     <td>{{release1Detail.fileSize}}</td>
                                     <td>{{release1Detail.onload}}</td>
                                 </tr>
-                                <tr style="text-align: center;">
+                                <tr style="text-align: center;" ng-if="release2Details.length > 0">
                                     <td style="background-color: #f5f5f5;" colspan="5"><h4>{{release2Name}}</h4></td>
                                 </tr>
-                                <tr ng-repeat="release2Detail in release2Details">
+                                <tr ng-if="release2Details.length > 0" ng-repeat="release2Detail in release2Details">
                                     <td title="{{release2Detail.url}}" class="ellipsis">{{release2Detail.url}}</td>
                                     <td>{{release2Detail.responseCode}}</td>
                                     <td>{{release2Detail.timeTaken}}</td>
@@ -385,7 +385,7 @@
                     <div class="container-fluid table-responsive hide" id="reportData" style="padding-left: 0;padding-right: 0;">
                         <div class="col-lg-2 col-sm-2 col-2">
                             <h5>
-                                <a href="javascript:void(0);" ng-click="showReportTab();">
+                                <a href="javascript:void(0);" ng-click="showReportTab(false);">
                                     <span style="font-size:12px;">&#10094;</span> Back
                                 </a>
                             </h5>

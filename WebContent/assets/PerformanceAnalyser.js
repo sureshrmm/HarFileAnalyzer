@@ -65,7 +65,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         }
     };
     $scope.showTotalComparisionData = function() {
-        if ($scope.analyseData && $scope.analyseData.notMatchedURLs) {
+        if ($scope.analyseData && $scope.analyseData.totalComparision) {
             $("#matchedURLs").addClass("hide");
             $("#unmatchedURLs").addClass("hide");
             $("#totalComparision").removeClass("hide");
@@ -150,10 +150,12 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $scope.wptConfig = response.data;
         });
     };
-    $scope.showAnalyseTab = function() {
-        $(".isactive").fadeOut("fast", function() {
-            $("#analyse").fadeIn("slow");
-        });
+    $scope.showAnalyseTab = function(fadeIn) {
+		if (fadeIn !== false) {
+			$(".isactive").fadeOut("fast", function() {
+				$("#analyse").fadeIn("slow");
+			});
+		}
         $("#report").removeClass("isactive");
         $("#reportTab").removeClass("active");
         $("#analyse").addClass("isactive");
@@ -165,10 +167,12 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#wpt").removeClass("isactive");
         $("#wptTab").removeClass("active");
     };
-    $scope.showReportTab = function() {
-        $(".isactive").fadeOut("fast", function() {
-            $("#report").fadeIn("slow");
-        });
+    $scope.showReportTab = function(fadeIn) {
+		if (fadeIn !== false) {
+			$(".isactive").fadeOut("fast", function() {
+				$("#report").fadeIn("slow");
+			});
+		}
         $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
         $("#report").addClass("isactive");
