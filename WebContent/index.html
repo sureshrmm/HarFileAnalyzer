@@ -47,7 +47,6 @@
         </style>
     </head>
     <body ng-controller="PerfAnalyserController">
-		<div class="har" validate="false" data-har="/HarFileAnalyzer/Arya_Cart_20Mbps_Android_Chrome.har"></div>
         <div id="loader" class="hide" style="position: fixed;top: 0;text-align: center;z-index: 1500;width: 100%;height: 200%;padding:23% 0;">
             <img src="data:image/gif;base64,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">
         </div>
@@ -70,8 +69,8 @@
                 <li id="compareReleasesTab">
                     <a href="#compareReleases" data-toggle="tab" ng-click="showCompareReleasesTab();">Compare</a>
                 </li>
-				<li id="HarViewer">
-                    <a href="#harViewer" data-toggle="tab">HarViewer</a>
+                <li id="harViewerTab">
+                    <a href="#harViewer" data-toggle="tab" ng-click="showHARViewerTab();">HAR Viewer</a>
                 </li>
             </ul>
 
@@ -134,8 +133,8 @@
                         </div>
                         <div ng-if="analyseData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
                             <h5>
-                            	<a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a><span> | </span>
-                            	<a ng-if="downloadHarAnalysysUrl" ng-href="{{downloadHarAnalysysUrl}}" download href="javascript:void(0);">Download Report</a>
+                                <a ng-click="showMatchedURLsData()" href="javascript:void(0);">View report</a><span> | </span>
+                                <a ng-if="downloadHarAnalysysUrl" ng-href="{{downloadHarAnalysysUrl}}" download href="javascript:void(0);">Download Report</a>
                             </h5>
                         </div>
                         <form>
@@ -145,7 +144,7 @@
                                     <div class="input-group">
                                         <label class="input-group-btn">
                                             <span class="btn btn-primary">
-                                                Browse&hellip; <input type="file" style="display: none;" id="firstHARFile" file-model="firstHARFile">
+                                                Browse&hellip; <input type="file" style="display: none;" id="firstHARFile" file-model="firstHARFile" accept=".har">
                                             </span>
                                         </label>
                                         <input type="text" class="form-control" readonly id="firstHARFileText">
@@ -170,7 +169,7 @@
                                     <div class="input-group">
                                         <label class="input-group-btn">
                                             <span class="btn btn-primary">
-                                                Browse&hellip; <input type="file" style="display: none;" id="secondHARFile" file-model="secondHARFile">
+                                                Browse&hellip; <input type="file" style="display: none;" id="secondHARFile" file-model="secondHARFile" accept=".har">
                                             </span>
                                         </label>
                                         <input type="text" class="form-control" readonly id="secondHARFileText">
@@ -359,8 +358,8 @@
                         </div>
                         <div ng-if="selectedHarData" class="col-lg-6 col-sm-6 col-6" style="text-align:right">
                             <h5>
-                            	<a ng-click="showReportData()" href="javascript:void(0);">View report</a><span> | </span>
-                            	<a ng-if="downloadHarReportUrl" ng-href="{{downloadHarReportUrl}}" download href="javascript:void(0);">Download Report</a>
+                                <a ng-click="showReportData()" href="javascript:void(0);">View report</a><span> | </span>
+                                <a ng-if="downloadHarReportUrl" ng-href="{{downloadHarReportUrl}}" download href="javascript:void(0);">Download Report</a>
                             </h5>
                         </div>
                         <form>
@@ -441,7 +440,7 @@
                                     <div class="input-group">
                                         <label class="input-group-btn">
                                             <span class="btn btn-primary">
-                                                Browse&hellip; <input type="file" style="display: none;" id="release1HARFiles">
+                                                Browse&hellip; <input type="file" style="display: none;" id="release1HARFiles" accept=".zip">
                                             </span>
                                         </label>
                                         <input type="text" class="form-control" readonly id="release1HARText">
@@ -454,7 +453,7 @@
                                     <div class="input-group">
                                         <label class="input-group-btn">
                                             <span class="btn btn-primary">
-                                                Browse&hellip; <input type="file" style="display: none;" id="release2HARFiles">
+                                                Browse&hellip; <input type="file" style="display: none;" id="release2HARFiles" accept=".zip">
                                             </span>
                                         </label>
                                         <input type="text" class="form-control" readonly id="release2HARText">
@@ -473,16 +472,52 @@
                         </form>
                     </div>
                 </div>
-				
+                <div class="tab-pane" id="harViewer">
+                    <div id="harViewerForm">
+                        <div class="col-lg-6 col-sm-6 col-6">
+                            <h3>HAR Viewer</h3>
+                        </div>
+                        <form>
+                            <div class="col-lg-12 col-sm-12 col-12">
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <h4 id="harViewerFileLbl">Select HAR file</h4>
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-primary">
+                                                Browse&hellip; <input type="file" style="display: none;" id="harViewerFile" accept=".har">
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly id="harViewerText">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-3 col-12">
+                                    <h4 class="visibility-hidden">View HAR</h4>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-primary pull-right" ng-click="validateHARViewerData();">Submit</button>
+                                        <input class="btn btn-default pull-right mr15" type="reset" value="Cancel" />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="hide" id="harViewerData" style="height:100%;">
+                        <div class="col-lg-12 col-sm-12 col-12">
+                            <h5>
+                                <a href="javascript:void(0);" ng-click="showHARViewerTab(false);">
+                                    <span style="font-size:12px;">&#10094;</span> Back
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="har" id="harViewerParentDiv" validate="false" height="90%" data-har="/HarFileAnalyzer/www.walgreens.com.170208_YX_ME6P.har"></div>
+                    </div>
+                </div>
             </div>
         </div>
     
         <script src="libs/js/jquery-3.1.1.min.js"></script>
         <script src="libs/js/angular.min.js"></script>
         <script src="libs/js/jquery.bootpag.min.js"></script>
-		<script id="har" src="libs/js/har.js"></script>
         <script src="assets/PerformanceAnalyser.js"></script>
-		
         
         <script>
             $(function() {

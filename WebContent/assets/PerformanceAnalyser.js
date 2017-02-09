@@ -146,16 +146,18 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#compareReleasesTab").removeClass("active");
         $("#wpt").addClass("isactive");
         $("#wptTab").addClass("active");
+        $("#harViewer").removeClass("isactive");
+        $("#harViewerTab").removeClass("active");
         perfAnalyserService.getService("config/wpt-config.json", function(response) {
             $scope.wptConfig = response.data;
         });
     };
     $scope.showAnalyseTab = function(fadeIn) {
-		if (fadeIn !== false) {
-			$(".isactive").fadeOut("fast", function() {
-				$("#analyse").fadeIn("slow");
-			});
-		}
+        if (fadeIn !== false) {
+            $(".isactive").fadeOut("fast", function() {
+                $("#analyse").fadeIn("slow");
+            });
+        }
         $("#report").removeClass("isactive");
         $("#reportTab").removeClass("active");
         $("#analyse").addClass("isactive");
@@ -166,13 +168,15 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#compareReleasesTab").removeClass("active");
         $("#wpt").removeClass("isactive");
         $("#wptTab").removeClass("active");
+        $("#harViewer").removeClass("isactive");
+        $("#harViewerTab").removeClass("active");
     };
     $scope.showReportTab = function(fadeIn) {
-		if (fadeIn !== false) {
-			$(".isactive").fadeOut("fast", function() {
-				$("#report").fadeIn("slow");
-			});
-		}
+        if (fadeIn !== false) {
+            $(".isactive").fadeOut("fast", function() {
+                $("#report").fadeIn("slow");
+            });
+        }
         $("#analyse").removeClass("isactive");
         $("#analyseTab").removeClass("active");
         $("#report").addClass("isactive");
@@ -183,6 +187,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#compareReleasesTab").removeClass("active");
         $("#wpt").removeClass("isactive");
         $("#wptTab").removeClass("active");
+        $("#harViewer").removeClass("isactive");
+        $("#harViewerTab").removeClass("active");
     };
     $scope.showCompareReleasesTab = function() {
         $(".isactive").fadeOut("fast", function() {
@@ -194,8 +200,29 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#reportTab").removeClass("active");
         $("#wpt").removeClass("isactive");
         $("#wptTab").removeClass("active");
+        $("#harViewer").removeClass("isactive");
+        $("#harViewerTab").removeClass("active");
         $("#compareReleases").addClass("isactive");
         $("#compareReleasesTab").addClass("active");
+    };
+    $scope.showHARViewerTab = function(fadeIn) {
+        if (fadeIn !== false) {
+            $(".isactive").fadeOut("fast", function() {
+                $("#harViewer").fadeIn("slow");
+            });
+        }
+        $("#analyse").removeClass("isactive");
+        $("#analyseTab").removeClass("active");
+        $("#report").removeClass("isactive");
+        $("#reportTab").removeClass("active");
+        $("#compareReleases").removeClass("isactive");
+        $("#compareReleasesTab").removeClass("active");
+        $("#wpt").removeClass("isactive");
+        $("#wptTab").removeClass("active");
+        $("#harViewer").addClass("isactive");
+        $("#harViewerTab").addClass("active");
+        $("#harViewerData").addClass("hide");
+        $("#harViewerForm").removeClass("hide");
     };
     $scope.generateReport = function() {
         var files = document.getElementById('reportFile').files;
@@ -361,6 +388,15 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         if (!hasError) {
             $scope.compareReleaseHarFiles();
         }
+    };
+    $scope.constructHARViewer = function() {
+        var har = document.createElement("script");
+        har.src = "libs/js/har.js";
+        har.setAttribute("id", "har");
+        har.setAttribute("async", "true");
+        document.documentElement.firstChild.appendChild(har);
+        $("#harViewerData").removeClass("hide");
+        $("#harViewerForm").addClass("hide");
     };
     $scope.showWPTTab();
 }]);
