@@ -197,12 +197,8 @@ public class HarFileAnalyzer {
 		return properties.getProperty(key);
 	}
 
-	private void writeToFile(InputStream uploadedInputStream, String harFileName) throws IOException {
-		File tempDir = new File(".");
-		tempDir = new File(tempDir + "/tempDir");
-		if (!tempDir.isDirectory()) {
-			tempDir.mkdirs();
-		}
+	private File writeToFile(InputStream uploadedInputStream, String harFileName) throws IOException {
+		File tempDir = getTempDir();
 		File file = new File(tempDir + "/" + harFileName);
 		OutputStream out = new FileOutputStream(file);
 		int read = 0;
@@ -212,6 +208,16 @@ public class HarFileAnalyzer {
 		}
 		out.flush();
 		out.close();
+		return file;
+	}
+
+	public File getTempDir() {
+		File tempDir = new File(".");
+		tempDir = new File(tempDir + "/tempDir");
+		if (!tempDir.isDirectory()) {
+			tempDir.mkdirs();
+		}
+		return tempDir;
 	}
 
 	private void deleteTempFile(File tempFile) {
@@ -267,15 +273,32 @@ public class HarFileAnalyzer {
 		return null;
 	}
 
-	@GET
-	@Path("/harComparision")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response harComparision() throws IOException {
-		String harfileLocation = getProperty("harfileslocation1");
+	@POST
+	@Path("/compareReleases")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response harComparision(FormDataMultiPart multipart) throws IOException {
+		
+		List<FormDataBodyPart> release1fields = multipart.getFields("release1HARFiles");
+		BodyPartEntity bodyPartEntity = (BodyPartEntity) release1fields.get(0).getEntity();
+		//System.out.println("fields.get(i) : " + fields.get(i).getContentDisposition().getFileName());
+		String fileName = release1fields.get(0).getContentDisposition().getFileName();
+		if (fileName != null && fileName != "") {
+			String[] split = fileName.split("/");
+			fileName = split[split.length - 1];
+			InputStream inputStream = bodyPartEntity.getInputStream();
+			File release1Zip = writeToFile(inputStream, fileName);
+			System.out.println("release1Zip====> " + release1Zip.getAbsolutePath());
+			File tempDir = getTempDir();
+			//HarAnalyzerUtil.unZip(release1Zip, tempDir.getAbsolutePath());
+			
+		}
+		
+		
+		/*String harfileLocation = getProperty("harfileslocation1");
 		HarReportUtil harReportUtil = new HarReportUtil("ARYA");
-		Map<String, HashMap<String,Double>> onloadPageloadValueTimeMap = new HashMap<String,HashMap<String,Double>>();
+		Map<String, HashMap<String,Double>> onloadPageloadValueTimeMap = new HashMap<String,HashMap<String,Double>>();*/
 		//String harfileLocation = "D:/TestData/Harfiles1/";
-		File harFiles = new File(harfileLocation);
+		/*File harFiles = new File(harfileLocation);
 		File[] listFiles = harFiles.listFiles();
 		for (File file : listFiles) {
 			harReportUtil.createReportHeader(file);
@@ -290,7 +313,7 @@ public class HarFileAnalyzer {
 			harReportUtil.createReportHeader(file);
 			harReportUtil.writeReportData(file, onloadPageloadValueTimeMap);
 		}
-		HarReportUtil.harComparisionReport(onloadPageloadValueTimeMap, "ARYA", "YODA");
+		HarReportUtil.harComparisionReport(onloadPageloadValueTimeMap, "ARYA", "YODA");*/
 		return null;
 	}
 	

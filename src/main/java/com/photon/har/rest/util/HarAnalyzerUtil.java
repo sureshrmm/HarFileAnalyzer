@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -49,8 +51,10 @@ public class HarAnalyzerUtil {
 	private static JSONArray notMatchedURLsArray = null;
 	private static JSONObject thirdsheetContent = null;
 	private static String downloadFile;
+	private static HarPage firstHarPage;
+	private static HarPage secondHarPage;
 	
-	static {
+	public static void init() {
 		workingFolder = getDownoadsDirectory();
 		if (!workingFolder.exists()) {
 			workingFolder.mkdir();
@@ -58,6 +62,7 @@ public class HarAnalyzerUtil {
 		System.out.println(workingFolder.getAbsolutePath());
 		DateFormat df = new SimpleDateFormat("ddMMYYYYHHmmss");
 		Date dateobj = new Date();
+		System.out.println("CurrentTime===>" + System.currentTimeMillis());
 		String curentTime = df.format(dateobj);
 		downloadFile = "harAnalysys" + curentTime + ".xls";
 		reportFile = new File(workingFolder.getAbsolutePath() + "\\" + downloadFile);
@@ -94,12 +99,19 @@ public class HarAnalyzerUtil {
 		sheet3Cells.add("Image - Count");
 		sheet3Cells.add("Image - Size");
 		sheet3Cells.add("Others- Count");
-		sheet3Cells.add("Others - Size");
+		sheet3Cells.add("Onload Time");
+		sheet3Cells.add("Page_Load Time");
+		sheet3Cells.add("TTFB");
+		sheet3Cells.add("Iteration");
+		sheet3Cells.add("TTFB");
 	}
 
 	public static void createOutputFolderNewXlsFile(HarPage firstPage, String FirstHarFileName, HarPage secondPage, String secondHarFileName) throws IOException {
+		init();
 		firstPageOnload = firstPage.getPageTimings().getOnLoad();
 		secondPageOnLoad = secondPage.getPageTimings().getOnLoad();
+		firstHarPage = firstPage;
+		secondHarPage = secondPage;
 
 		firstHarName = FirstHarFileName;
 		secondHarName = secondHarFileName;
@@ -280,10 +292,10 @@ public class HarAnalyzerUtil {
 		removeHarEntry(firstEntryList, secondEntryList, firstAddedList, secondAddedList);
 		
 		JSONObject thirdSheet = new JSONObject();
-		writeThirdSheet(firstAddedList, 1);
+		writeThirdSheet(firstAddedList,firstPageOnload, 1);
 		thirdSheet.put(firstHarName, thirdsheetContent);
 		thirdsheetContent = new JSONObject();
-		writeThirdSheet(secondAddedList, 2);
+		writeThirdSheet(secondAddedList,secondPageOnLoad, 2);
 		thirdSheet.put(secondHarName, thirdsheetContent);
 		
 		JSONObject jsonObject= new JSONObject();
@@ -319,7 +331,7 @@ public class HarAnalyzerUtil {
 		}
 	}
 
-	private static void writeThirdSheet(List<HarEntry> harEntries, int col) {
+	private static void writeThirdSheet(List<HarEntry> harEntries, long onloadTime, int col) {
 		try {
 			FileInputStream fsIP = new FileInputStream(reportFile);
 
@@ -413,6 +425,34 @@ public class HarAnalyzerUtil {
 			HSSFCell cell10 = row10.createCell(col);
 			cell10.setCellValue(othersCount);
 			
+			HSSFRow row11 = worksheet.getRow(11);
+			HSSFCell cell11 = row11.createCell(col);
+			cell11.setCellValue(onloadTime);
+			
+			double pageLoadTime = 0;
+			long ttfb = 0;
+			int iteration = 0;
+			if (col ==1) {
+				pageLoadTime = HarReportUtil.calculatePageLoadTime(firstHarPage, harEntries);
+				ttfb = Long.parseLong(firstHarPage.getCustomFields().getCustomFieldValue("_TTFB"));
+				iteration = Integer.parseInt(firstHarPage.getCustomFields().getCustomFieldValue("_run"));
+			} else if (col == 2) {
+				pageLoadTime = HarReportUtil.calculatePageLoadTime(secondHarPage, harEntries);
+				ttfb = Long.parseLong(secondHarPage.getCustomFields().getCustomFieldValue("_TTFB"));
+				iteration = Integer.parseInt(secondHarPage.getCustomFields().getCustomFieldValue("_run"));
+			}
+			HSSFRow row12 = worksheet.getRow(12);
+			HSSFCell cell12 = row12.createCell(col);
+			cell12.setCellValue(pageLoadTime);
+			
+			HSSFRow row13 = worksheet.getRow(13);
+			HSSFCell cell13 = row13.createCell(col);
+			cell13.setCellValue(ttfb);
+			
+			HSSFRow row14 = worksheet.getRow(14);
+			HSSFCell cell14 = row14.createCell(col);
+			cell14.setCellValue(iteration);
+			
 			thirdsheetContent.put("totalRequest", harEntries.size());
 			thirdsheetContent.put("htmlCount", htmlCount);
 			thirdsheetContent.put("htmlSize", htmlSize);
@@ -423,7 +463,10 @@ public class HarAnalyzerUtil {
 			thirdsheetContent.put("imageCount", imageCount);
 			thirdsheetContent.put("imageSize", imageSize);
 			thirdsheetContent.put("othersCount", othersCount);
-			
+			thirdsheetContent.put("onload", onloadTime);
+			thirdsheetContent.put("pageload", pageLoadTime);
+			thirdsheetContent.put("ttfb", ttfb);
+			thirdsheetContent.put("iteration", iteration);
 
 			FileOutputStream output_file = new FileOutputStream(reportFile);
 
@@ -740,5 +783,42 @@ public class HarAnalyzerUtil {
 		String property = System.getProperty("user.dir");
 		File rootDir = new File(property);
 		return new File(rootDir.getParent() + File.separator + "webapps" + File.separator + "HarFileAnalyzer/downloads/");
+	}
+	
+	public static void unZipIt(String zipFile, String outputFolder) {
+		byte[] buffer = new byte[1024];
+		try {
+			File folder = new File(outputFolder);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+			ZipEntry ze = zis.getNextEntry();
+			while (ze != null) {
+				String fileName = ze.getName();
+				File newFile = new File(outputFolder + File.separator + fileName);
+				System.out.println("file unzip : " + newFile.getAbsoluteFile());
+				new File(newFile.getParent()).mkdirs();
+				FileOutputStream fos = new FileOutputStream(newFile);
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+				fos.close();
+				ze = zis.getNextEntry();
+			}
+			zis.closeEntry();
+			zis.close();
+			System.out.println("Done");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static void unZip(File zipFilePath, String destDirectory) throws IOException {
+		/*Unzip unzip = new Unzip();
+		unzip.setSrc(zipFilePath);
+		unzip.setDescription(destDirectory);
+		unzip.execute();*/
 	}
 }

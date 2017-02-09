@@ -331,7 +331,7 @@ public class HarReportUtil {
 	
 	
 	
-	private double calculatePageLoadTime(HarPage page, List<HarEntry> entryList) {
+	public static double calculatePageLoadTime(HarPage page, List<HarEntry> entryList) {
 	    long pageLoadTime = 0;
 	    long startTime = page.getStartedDateTime().getTime();
 		long loadTime = 0;   
