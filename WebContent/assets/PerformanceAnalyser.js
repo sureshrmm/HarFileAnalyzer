@@ -398,6 +398,35 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#harViewerData").removeClass("hide");
         $("#harViewerForm").addClass("hide");
     };
+    $scope.viewHARFile = function() {
+        var files = document.getElementById('harViewerFile').files;
+        var serviceURL = "/HarFileAnalyzer/api/getHarReport/";
+        var requestData = {};
+        requestData.from = "harViewer";
+        var fd = new FormData();
+        fd.append('files', files[0]);
+        fd.append('requestData', angular.toJson(requestData));
+        $("#loader").removeClass("hide");
+        perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
+            $("#loader").addClass("hide");
+            $("#harViewerParentDiv").attr("data-har", response.data.downloadUrl);
+            $scope.constructHARViewer();
+        });
+    };
+    $scope.validateHARViewerData = function() {
+        var hasError = false;
+        if (!$("#harViewerFile").val()) {
+            $("#harViewerFileLbl").addClass("color-red");
+            $("#harViewerText").addClass("border-red");
+            hasError = true;
+        } else {
+            $("#harViewerFileLbl").removeClass("color-red");
+            $("#harViewerText").removeClass("border-red");
+        }
+        if (!hasError) {
+            $scope.viewHARFile();
+        }
+    };
     $scope.showWPTTab();
 }]);
 perfAnalyserApp.service('perfAnalyserService', ['$http', function ($http) {
