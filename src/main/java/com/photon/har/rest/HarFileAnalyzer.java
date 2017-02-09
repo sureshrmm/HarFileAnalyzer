@@ -18,12 +18,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,13 +60,13 @@ public class HarFileAnalyzer {
 			String secondFileName = fileDetail2.getFileName();
 			writeToFile(inputStream2, secondFileName);
 			Response response = getHarAnalysys(firstFileName, secondFileName, jsonObject);
-			File deleteDir = new File(".");
-			deleteDir = new File(deleteDir + "/tempDir/");
+			File deleteDir = getTempDir();
 			if (deleteDir.isDirectory()) {
 				deleteTempFile(deleteDir);
 			}
 			return response;
 		} catch (IOException e) {
+			e.printStackTrace();
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
 			return Response.status(301).entity(bean).build();
@@ -77,8 +77,7 @@ public class HarFileAnalyzer {
 		ResponseBean bean = new ResponseBean();
 		try {
 			HarFileReader harReader = new HarFileReader();
-			File tempDir = new File(".");
-			tempDir = new File(tempDir + "/tempDir");
+			File tempDir = getTempDir();
 			JSONObject request1 = jsonObject.getJSONObject("file1");
 			String firstHarName = request1.get("name").toString();
 			String firstHarIteration = request1.get("iteration").toString();
@@ -111,6 +110,10 @@ public class HarFileAnalyzer {
 					secondPage = harPage;
 				}
 			}
+			
+			if (firstPage == null) {
+				
+			}
 
 			HarAnalyzerUtil.createOutputFolderNewXlsFile(firstPage, firstHarName, secondPage, secondHarName);
 
@@ -133,6 +136,7 @@ public class HarFileAnalyzer {
 			ResponseBean responseBean = HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
 			return Response.status(200).entity(responseBean).build();
 		}  catch (IOException e) {
+			e.printStackTrace();
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
 			return Response.status(301).entity(bean).build();
@@ -145,11 +149,13 @@ public class HarFileAnalyzer {
 	@POST
 	@Path("/getHarReport")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response getHarReport(FormDataMultiPart multipart) {
+	public Response getHarReport(FormDataMultiPart multipart, @FormDataParam("requestData") JSONObject jsonObject) {
 
 		JSONArray rootArray = new JSONArray();
-		String reportFile;
+		String reportFile = null;
 		try {
+			File tempDir = getTempDir();
+			FileUtils.deleteDirectory(tempDir);
 			List<FormDataBodyPart> fields = multipart.getFields("files");
 			for (int i = 0; i < fields.size(); i++) {
 				BodyPartEntity bodyPartEntity = (BodyPartEntity) fields.get(i).getEntity();
@@ -161,10 +167,18 @@ public class HarFileAnalyzer {
 					InputStream inputStream = bodyPartEntity.getInputStream();
 					writeToFile(inputStream, fileName);
 				}
+				if (jsonObject != null) {
+					String from = jsonObject.get("from").toString();
+					if ("harViewer".equals(from)) {
+						ResponseBean bean = new ResponseBean();
+						bean.setStatus(200);
+						bean.setMessage("Success");
+						bean.setDownloadUrl("/downloads/tempDir" + File.separator + fileName);
+						return Response.status(200).entity(bean).build();
+					}
+				}
 			}
-			File tempDir = new File(".");
-			tempDir = new File(tempDir + "/tempDir");
-
+			
 			String harfileLocation = tempDir.getAbsolutePath();
 			File harFiles = new File(harfileLocation);
 			File[] listFiles = harFiles.listFiles();
@@ -180,7 +194,10 @@ public class HarFileAnalyzer {
 			}
 			deleteTempFile(tempDir);
 		} catch (IOException e) {
+			e.printStackTrace();
 			return Response.status(301).entity("Har Report Failed...").build();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 		ResponseBean bean = new ResponseBean();
 		bean.setStatus(200);
@@ -212,8 +229,10 @@ public class HarFileAnalyzer {
 	}
 
 	public File getTempDir() {
-		File tempDir = new File(".");
-		tempDir = new File(tempDir + "/tempDir");
+		File tempDir;
+		String temp = System.getProperty("user.dir");
+		temp = new File(temp).getParent();
+		tempDir = new File(temp + "/webapps/downloads/tempDir");
 		if (!tempDir.isDirectory()) {
 			tempDir.mkdirs();
 		}
@@ -287,7 +306,6 @@ public class HarFileAnalyzer {
 			fileName = split[split.length - 1];
 			InputStream inputStream = bodyPartEntity.getInputStream();
 			File release1Zip = writeToFile(inputStream, fileName);
-			System.out.println("release1Zip====> " + release1Zip.getAbsolutePath());
 			File tempDir = getTempDir();
 			//HarAnalyzerUtil.unZip(release1Zip, tempDir.getAbsolutePath());
 			
