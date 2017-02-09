@@ -25,26 +25,43 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
                     $scope.message = response.data.message;
                     $("#errorMessage").removeClass("hide");
                 } else {
-                    $scope.showAnalyseResponse(JSON.parse(response.data.jsonObject));
+                    $scope.analyseData = JSON.parse(response.data.jsonObject);
                     $scope.downloadHarAnalysysUrl = response.data.downloadUrl;
+                    $scope.firstHARUrl = response.data.firstHARUrl;
+                    $scope.secondHARUrl = response.data.secondHARUrl;
+                    $scope.showHARComparison();
                 }
             }
         });
     };
-    $scope.showAnalyseResponse = function(response) {
+    $scope.showHARComparison = function() {
+        $(".har").removeClass("har");
+        $("#analysisForm").addClass("hide");
+        $("#analysisReport").removeClass("hide");
+        $("#matchedURLs").addClass("hide");
+        $("#unmatchedURLs").addClass("hide");
+        $("#totalComparision").addClass("hide");
+        $("#compareHARView").css("font-weight","bold");
+        $("#matchedURLsLink").css("font-weight","normal");
+        $("#unmatchedURLsLink").css("font-weight","normal");
+        $("#totalComparisionLink").css("font-weight","normal");
+        $("#har1ViewerParentDiv").addClass("har").attr("data-har", $scope.firstHARUrl);
+        $("#har2ViewerParentDiv").addClass("har").attr("data-har", $scope.secondHARUrl);
+        $scope.constructHARViewer();
+    };
+    /*$scope.showAnalyseResponse = function(response) {
         $scope.analyseData = response;
         $scope.showMatchedURLsData();
-    };
+    };*/
     $scope.showMatchedURLsData = function() {
         if ($scope.analyseData && $scope.analyseData.matchedURLs) {
-            $("#analysisForm").addClass("hide");
-            $("#analysisReport").removeClass("hide");
             $("#matchedURLs").removeClass("hide");
             $("#unmatchedURLs").addClass("hide");
             $("#totalComparision").addClass("hide");
             $("#matchedURLsLink").css("font-weight","bold");
             $("#unmatchedURLsLink").css("font-weight","normal");
             $("#totalComparisionLink").css("font-weight","normal");
+            $("#compareHARView").css("font-weight","normal");
             $scope.release1Name = $scope.analyseData.matchedURLs.details[0].releaseName;
             $scope.release2Name = $scope.analyseData.matchedURLs.details[1].releaseName;
             $scope.release1Details = $scope.analyseData.matchedURLs.details[0].requestDetails;
@@ -60,6 +77,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $("#matchedURLsLink").css("font-weight","normal");
             $("#unmatchedURLsLink").css("font-weight","bold");
             $("#totalComparisionLink").css("font-weight","normal");
+            $("#compareHARView").css("font-weight","normal");
             $scope.release1Details = $scope.analyseData.notMatchedURLs[$scope.release1Name];
             $scope.release2Details = $scope.analyseData.notMatchedURLs[$scope.release2Name];
         }
@@ -71,13 +89,13 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $("#totalComparision").removeClass("hide");
             $("#matchedURLsLink").css("font-weight","normal");
             $("#unmatchedURLsLink").css("font-weight","normal");
+            $("#compareHARView").css("font-weight","normal");
             $("#totalComparisionLink").css("font-weight","bold");
             $scope.release1Details = $scope.analyseData.totalComparision[$scope.release1Name];
             $scope.release2Details = $scope.analyseData.totalComparision[$scope.release2Name];
         }
     };
     $scope.validateAnalyseHarFilesData = function() {
-        $scope.showAnalyseResponse();
         var hasError = false;
         if (!$("#firstHARFile").val()) {
             $("#firstHARFileLbl").addClass("color-red");
@@ -390,6 +408,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         }
     };
     $scope.constructHARViewer = function() {
+        $("#har").remove();
         var har = document.createElement("script");
         har.src = "libs/js/har.js";
         har.setAttribute("id", "har");
@@ -409,6 +428,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#loader").removeClass("hide");
         perfAnalyserService.postMultiPartData(serviceURL, fd, function(response) {
             $("#loader").addClass("hide");
+            $(".har").removeClass("har");
+            $("#harViewerParentDiv").addClass("har");
             $("#harViewerParentDiv").attr("data-har", response.data.downloadUrl);
             $scope.constructHARViewer();
         });

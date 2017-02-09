@@ -44,6 +44,12 @@
                 font-weight: normal;
                 font-size: 14px;
             }
+            .pl0 {
+                padding-left: 0;
+            }
+            .pr0 {
+                padding-right: 0;
+            }
         </style>
     </head>
     <body ng-controller="PerfAnalyserController">
@@ -204,6 +210,10 @@
                         </div>
                         <div class="col-lg-6 col-sm-6 col-6" style="text-align: right;">
                             <h5>
+                                <a href="javascript:void(0);" ng-click="showHARComparison();" id="compareHARView">
+                                    View HAR
+                                </a>
+                                <span> | </span>
                                 <a href="javascript:void(0);" ng-click="showMatchedURLsData();" id="matchedURLsLink">
                                     Matched URLs
                                 </a>
@@ -217,7 +227,11 @@
                                 </a>
                             </h5>
                         </div>
-                        <table class="table table-condensed" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
+                        <div id="harComparison">
+                            <div class="col-lg-6 col-sm-6 col-6 pl0 pr0" id="har1ViewerParentDiv" validate="false" height="90%" data-har=""></div>
+                            <div class="col-lg-6 col-sm-6 col-6 pl0 pr0" id="har2ViewerParentDiv" validate="false" height="90%" data-har=""></div>
+                        </div>
+                        <table class="table table-condensed hide" style="table-layout: fixed;word-wrap: break-word;" id="matchedURLs">
                             <thead>
                                 <tr>
                                     <th class="col-xs-2"></th>
@@ -528,7 +542,7 @@
                                 </a>
                             </h5>
                         </div>
-                        <div class="har" id="harViewerParentDiv" validate="false" height="90%" data-har="/HarFileAnalyzer/www.walgreens.com.170208_YX_ME6P.har"></div>
+                        <div id="harViewerParentDiv" validate="false" height="90%" data-har=""></div>
                     </div>
                 </div>
             </div>
