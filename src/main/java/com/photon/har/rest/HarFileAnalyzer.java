@@ -55,16 +55,24 @@ public class HarFileAnalyzer {
 			@FormDataParam("requestData") JSONObject jsonObject, FormDataMultiPart form) {
 		ResponseBean bean = new ResponseBean();
 		try {
+			File tempDir = getTempDir();
+			FileUtils.deleteDirectory(tempDir);
 			String firstFileName = fileDetail1.getFileName();
-			writeToFile(inputStream1, firstFileName);
+			File firstHar = writeToFile(inputStream1, firstFileName);
 			String secondFileName = fileDetail2.getFileName();
-			writeToFile(inputStream2, secondFileName);
-			Response response = getHarAnalysys(firstFileName, secondFileName, jsonObject);
-			File deleteDir = getTempDir();
-			if (deleteDir.isDirectory()) {
-				deleteTempFile(deleteDir);
+			File secondHar = writeToFile(inputStream2, secondFileName);
+			String parentDir = new File(System.getProperty("user.dir")).getParent();
+			File destDir = new File(parentDir + "/webapps/HarFileAnalyzer/libs/js/tempDir/");
+			FileUtils.deleteDirectory(destDir);
+			if (!destDir.isDirectory()){
+				destDir.mkdirs();
 			}
-			return response;
+			FileUtils.copyFile(firstHar, new File(destDir + File.separator + firstHar.getName()));
+			FileUtils.copyFile(secondHar, new File(destDir + File.separator + secondHar.getName()));
+			ResponseBean responseBean = getHarAnalysys(firstFileName, secondFileName, jsonObject);
+			responseBean.setFirstHARUrl("tempDir" + File.separator + firstFileName);
+			responseBean.setSecondHARUrl("tempDir" + File.separator + secondFileName);
+			return Response.status(301).entity(responseBean).build();
 		} catch (IOException e) {
 			e.printStackTrace();
 			bean.setStatus(301);
@@ -73,7 +81,7 @@ public class HarFileAnalyzer {
 		}
 	}
 
-	private Response getHarAnalysys(String firstHarfileLocation, String secondHarfileLocation, JSONObject jsonObject) {
+	private ResponseBean getHarAnalysys(String firstHarfileLocation, String secondHarfileLocation, JSONObject jsonObject) {
 		ResponseBean bean = new ResponseBean();
 		try {
 			HarFileReader harReader = new HarFileReader();
@@ -133,13 +141,12 @@ public class HarFileAnalyzer {
 				}
 			}
 
-			ResponseBean responseBean = HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
-			return Response.status(200).entity(responseBean).build();
+			return HarAnalyzerUtil.xlsReadWriteUpdate(firstEntry, secondEntry);
 		}  catch (IOException e) {
 			e.printStackTrace();
 			bean.setStatus(301);
 			bean.setMessage(e.getLocalizedMessage());
-			return Response.status(301).entity(bean).build();
+			return bean;
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

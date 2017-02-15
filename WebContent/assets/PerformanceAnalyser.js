@@ -29,6 +29,8 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
                     $scope.downloadHarAnalysysUrl = response.data.downloadUrl;
                     $scope.firstHARUrl = response.data.firstHARUrl;
                     $scope.secondHARUrl = response.data.secondHARUrl;
+					$scope.release1Name = $scope.analyseData.matchedURLs.details[0].releaseName;
+					$scope.release2Name = $scope.analyseData.matchedURLs.details[1].releaseName;
                     $scope.showHARComparison();
                 }
             }
@@ -41,6 +43,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
         $("#matchedURLs").addClass("hide");
         $("#unmatchedURLs").addClass("hide");
         $("#totalComparision").addClass("hide");
+		$("#harComparison").removeClass("hide");
         $("#compareHARView").css("font-weight","bold");
         $("#matchedURLsLink").css("font-weight","normal");
         $("#unmatchedURLsLink").css("font-weight","normal");
@@ -55,9 +58,10 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
     };*/
     $scope.showMatchedURLsData = function() {
         if ($scope.analyseData && $scope.analyseData.matchedURLs) {
-            $("#matchedURLs").removeClass("hide");
+			$("#matchedURLs").removeClass("hide");
             $("#unmatchedURLs").addClass("hide");
             $("#totalComparision").addClass("hide");
+			$("#harComparison").addClass("hide");
             $("#matchedURLsLink").css("font-weight","bold");
             $("#unmatchedURLsLink").css("font-weight","normal");
             $("#totalComparisionLink").css("font-weight","normal");
@@ -74,6 +78,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $("#matchedURLs").addClass("hide");
             $("#unmatchedURLs").removeClass("hide");
             $("#totalComparision").addClass("hide");
+			$("#harComparison").addClass("hide");
             $("#matchedURLsLink").css("font-weight","normal");
             $("#unmatchedURLsLink").css("font-weight","bold");
             $("#totalComparisionLink").css("font-weight","normal");
@@ -87,6 +92,7 @@ perfAnalyserApp.controller('PerfAnalyserController', ['$scope', 'perfAnalyserSer
             $("#matchedURLs").addClass("hide");
             $("#unmatchedURLs").addClass("hide");
             $("#totalComparision").removeClass("hide");
+			$("#harComparison").addClass("hide");
             $("#matchedURLsLink").css("font-weight","normal");
             $("#unmatchedURLsLink").css("font-weight","normal");
             $("#compareHARView").css("font-weight","normal");
